@@ -1,16 +1,16 @@
 {
   "short_name": "DigiSoil",
-  "name": "DigiSoil | MITS Gwalior",
+  "name": "DigiSoil | MITS-DU Gwalior",
   "icons": [
     {
-      "src": "digisoil_logo.png.jpeg",
+      "src": "digisoil_logo",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "digisoil_logo.png.jpeg",
+      "src": "digisoil_logo",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/jpeg/png"
     }
   ],
   "start_url": ".",
