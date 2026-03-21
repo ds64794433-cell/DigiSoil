@@ -5,7 +5,7 @@ import importlib
 st.markdown(
     f"""
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="apple-touch-icon" href="digisoil_logo.png.jpeg">
     """,
     unsafe_allow_html=True
 )
@@ -13,7 +13,7 @@ st.markdown(
 # This changes the Browser Tab name and icon
 st.set_page_config(
     page_title="DigiSoil",
-    page_icon="icon.png"
+    page_icon="digisoil_logo.png.jpeg"
 )
 
 if "nav_choice" not in st.session_state:
