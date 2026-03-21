@@ -2,157 +2,191 @@ import streamlit as st
 import pandas as pd
 from fpdf import FPDF
 import os
+from datetime import datetime
 
-# 1. Complete USCS Dictionary with Recommendations
-USCS_DATA = {
-    "GW": ("Well-graded gravel", "Excellent base material, good drainage."),
-    "GP": ("Poorly graded gravel", "Possible voids, needs compaction control."),
-    "GM": ("Silty gravel", "Fair foundation material, frost susceptible."),
-    "GC": ("Clayey gravel", "Good base, low permeability, stable."),
-    "SW": ("Well-graded sand", "Excellent foundation, good permeability."),
-    "SP": ("Poorly graded sand", "Potential for liquefaction, requires compaction."),
-    "SM": ("Silty sand", "Erosion prone, sensitive to moisture changes."),
-    "SC": ("Clayey sand", "Good stability, low permeability."),
-    "ML": ("Silt, low plasticity", "Frost susceptible, poor drainage."),
-    "MH": ("Silt, high plasticity", "Highly compressible, poor foundation."),
-    "CL": ("Clay, low plasticity", "Predictable, moderate shrink-swell."),
-    "CH": ("Clay, high plasticity", "High expansion, requires stabilization."),
-    "OL": ("Organic clay/silt, low plasticity", "Unsuitable for structural foundations."),
-    "OH": ("Organic clay/silt, high plasticity", "Highly compressible, avoid for load-bearing."),
-    "GW-GM": ("Well-graded gravel with silt", "Good stability, verify drainage."),
-    "GP-GM": ("Poorly graded gravel with silt", "Requires drainage evaluation."),
-    "GW-GC": ("Well-graded gravel with clay", "Very stable base material."),
-    "GP-GC": ("Poorly graded gravel with clay", "Good base, check permeability."),
-    "SW-SM": ("Well-graded sand with silt", "Good stability, moderate permeability."),
-    "SP-SM": ("Poorly graded sand with silt", "Moderate stability, check compaction."),
-    "SW-SC": ("Well-graded sand with clay", "Stable, low permeability."),
-    "SP-SC": ("Poorly graded sand with clay", "Stable, check for voids."),
-    "GC-GM": ("Clayey gravel with silt", "Mixed behavior, moderate permeability."),
-    "SC-SM": ("Clayey sand with silt", "Mixed behavior, evaluate drainage."),
-    "CL-ML": ("Silty clay (Dual symbol)", "Transition zone behavior, check plasticity."),
-    "CI": ("Intermediate plasticity clay", "Stable if compacted properly."),
-    "MI": ("Intermediate plasticity silt", "Monitor moisture closely.")
+# 1. Comprehensive IS 1498 Data Dictionary
+IS_DATA = {
+    "GW": ("Well-graded gravel", "Excellent base material, high shear strength."),
+    "GP": ("Poorly graded gravel", "Uniform sizes, requires good compaction."),
+    "GM": ("Silty gravel", "Fair foundation, monitor moisture for frost."),
+    "GC": ("Clayey gravel", "Excellent stability, low permeability."),
+    "SW": ("Well-graded sand", "Strong foundation, excellent drainage."),
+    "SP": ("Poorly graded sand", "Uniform sand, check for liquefaction risk."),
+    "SM": ("Silty sand", "Erosion sensitive, fair stability."),
+    "SC": ("Clayey sand", "Low permeability, stable when compacted."),
+    "ML": ("Silt (Low Plasticity)", "Poor drainage, high frost susceptibility."),
+    "MI": ("Silt (Intermediate Plasticity)", "Moderate compressibility, stable if dry."),
+    "MH": ("Silt (High Plasticity)", "Highly elastic, poor for foundations."),
+    "CL": ("Clay (Low Plasticity)", "Medium toughness, predictable settlement."),
+    "CI": ("Clay (Intermediate Plasticity)", "Medium compressibility, good for embankments."),
+    "CH": ("Clay (High Plasticity)", "High swelling potential (Black Cotton Soil type)."),
+    "CL-ML": ("Silty Clay (Transition)", "Dual behavior, common in low plasticity zones."),
+    "GW-GC": ("Well-graded gravel with clay", "Very high stability, low drainage."),
+    "GP-GC": ("Poorly graded gravel with clay", "Stable base, check grading."),
+    "GW-GM": ("Well-graded gravel with silt", "Good stability, check frost."),
+    "GP-GM": ("Poorly graded gravel with silt", "Fair stability, uniform grading."),
+    "SW-SC": ("Well-graded sand with clay", "Good for pavement subgrade."),
+    "SP-SC": ("Poorly graded sand with clay", "Stable, check permeability."),
+    "SW-SM": ("Well-graded sand with silt", "Good drainage, erosion prone."),
+    "SP-SM": ("Poorly graded sand with silt", "Uniform sand, fair drainage.")
 }
 
-def create_pdf(data, symbol, desc, rec):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", 'B', 16)
-    pdf.cell(200, 10, txt="Comprehensive Soil Analysis Report", ln=True, align='C')
-    pdf.set_font("Arial", size=12)
-    pdf.ln(10)
-    for k, v in data.items(): pdf.cell(200, 10, txt=f"{k}: {v}", ln=True)
-    pdf.ln(5)
-    pdf.set_font("Arial", 'B', 14)
-    pdf.cell(200, 10, txt=f"Final Classification: {symbol}", ln=True)
-    pdf.set_font("Arial", 'I', 12)
-    pdf.cell(200, 10, txt=f"Description: {desc}", ln=True)
-    pdf.ln(2)
-    pdf.set_font("Arial", size=12)
-    pdf.multi_cell(0, 10, txt=f"Engineering Recommendation: {rec}")
-    if os.path.exists("gsd_curve.png"): 
-        pdf.ln(10)
-        pdf.image("gsd_curve.png", x=10, y=None, w=150)
+# 2. Enhanced PDF Class with MITS Branding
+class DigiSoilPDF(FPDF):
+    def header(self):
+        self.set_font('Arial', 'B', 12)
+        self.cell(0, 10, 'MITS-DU Gwalior - Department of Civil Engineering', 0, 1, 'C')
+        self.set_font('Arial', 'I', 10)
+        self.cell(0, 5, 'DigiSoil 2026', 0, 1, 'C')
+        self.ln(10)
 
-    # Inside create_pdf function
-    if os.path.exists("gsd_curve.png"): 
-        pdf.ln(10)
-        pdf.image("gsd_curve.png", x=10, w=150)
-    else:
-        pdf.ln(10)
-        pdf.cell(200, 10, txt="Note: GSD Curve not generated.", ln=True)
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('Arial', 'I', 8)
+        self.cell(0, 10, f'Page {self.page_no()} | Generated by DigiSoil ', 0, 0, 'C')
+
+def create_pdf(data_dict, symbol, desc, rec, student_name="Diya Sharma"):
+    pdf = DigiSoilPDF()
+    pdf.add_page()
+    
+    pdf.set_font("Arial", 'B', 16)
+    pdf.cell(200, 10, txt="Comprehensive Soil Classification Report", ln=True, align='C')
+    pdf.ln(5)
+
+    pdf.set_font("Arial", 'B', 11)
+    pdf.cell(100, 7, txt=f"Developed by: {student_name}", ln=True)
+    pdf.cell(100, 7, txt=f"Enrolment: (BTCE24O1027)", ln=True)
+    pdf.cell(100, 7, txt=f"Institute: MITS-DU GWALIOR", ln=True)
+    pdf.cell(100, 7, txt=f"Date: {datetime.now().strftime('%d-%m-%Y %H:%M')}", ln=True)
+    pdf.ln(8)
+
+    # 1. PARAMETERS TABLE (Individual Rows)
+    pdf.set_fill_color(220, 230, 241)
+    pdf.set_font("Arial", 'B', 11)
+    pdf.cell(110, 8, "Engineering Parameter", 1, 0, 'L', True)
+    pdf.cell(80, 8, "Observed Value", 1, 1, 'C', True)
+    
+    pdf.set_font("Arial", '', 10)
+    for k, v in data_dict.items():
+        pdf.cell(110, 7, txt=str(k), border=1)
+        pdf.cell(80, 7, txt=str(v), border=1, ln=True, align='C')
+
+    # 2. FINAL RESULT BOX
+    pdf.ln(8)
+    pdf.set_fill_color(255, 235, 235)
+    pdf.set_font("Arial", 'B', 14)
+    pdf.set_text_color(200, 0, 0)
+    pdf.cell(190, 10, txt=f"Final IS Symbol: {symbol}", border=1, ln=True, align='C', fill=True)
+    
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_font("Arial", 'I', 11)
+    pdf.multi_cell(190, 7, txt=f"Description: {desc}", border='LR')
+    pdf.set_font("Arial", 'B', 11)
+    pdf.cell(190, 7, txt="Recommendation:", border='LR', ln=True)
+    pdf.set_font("Arial", '', 10)
+    pdf.multi_cell(190, 6, txt=rec, border='LRB')
+
+    if os.path.exists("gsd_curve.png"):
+        pdf.ln(5)
+        pdf.image("gsd_curve.png", x=20, w=170)
 
     return pdf.output(dest='S').encode('latin-1')
 
 def run():
-    st.header("Full Soil Classification (USCS)")
-    
-    # Retrieve data from session state
-    ll = st.session_state.get("ll_result", 0.0)
+    st.title("🛡️ Final Classification Module")
+    st.info("DigiSoil'26 | MITS-DU Gwalior")
+
+    # Corrected Retrieval (Matching your GSD keys)
+    ll = st.session_state.get("liquid_limit_val", 0.0)
+    pl = st.session_state.get("plastic_limit_val", 0.0)
     pi = st.session_state.get("pi_result", 0.0)
-    fines = st.session_state.get("fines_result", 0.0)
-    cu = st.session_state.get("cu_result", 0.0)
-    cc = st.session_state.get("cc_result", 0.0)
-    gravel = st.session_state.get("gravel_percent", 0.0) 
+    fines = st.session_state.get("fines_percent", 0.0)
+    gravel = st.session_state.get("gravel_percent", 0.0)
     sand = st.session_state.get("sand_percent", 0.0)
+    cu = st.session_state.get("cu_result", None)
+    cc = st.session_state.get("cc_result", None)
+    d10 = st.session_state.get("d10_val", "N/A")
+    d30 = st.session_state.get("d30_val", "N/A")
+    d60 = st.session_state.get("d60_val", "N/A")
+    nmc = st.session_state.get("nmc_result", 0.0)
+    li = st.session_state.get("liquidity_index", 0.0)
+    gs = st.session_state.get("specific_gravity_val", 2.65)
 
-    if ll == 0 and pi == 0 and fines == 0:
-        st.warning("⚠️ **Missing Data:** Please complete the GSD and Atterberg Limit tests first.")
-        # We don't return here, we just show the warning so the user can still see the UI
+    if ll == 0 and fines == 0:
+        st.warning("⚠️ No data detected. Please run Sieve Analysis and Atterberg Limit tests.")
+        if st.button("Back to Home"):
+            st.session_state.nav_choice = "Home"
+            st.rerun()
+        return 
 
-    # Display Summary with 6 columns (Gravel and Sand added)
-    st.write("### Measured Index Properties")
-    c1, c2, c3, c4, c5, c6 = st.columns(6)
-    c1.metric("LL", f"{ll:.1f}%")
-    c2.metric("PI", f"{pi:.1f}%")
-    c3.metric("Fines", f"{fines:.1f}%")
-    c4.metric("Gravel", f"{gravel:.1f}%")
-    c5.metric("Sand", f"{sand:.1f}%")
-    c6.metric("Cu/Cc", f"{cu:.1f}/{cc:.1f}")
+    # 1. Dashbord Metrics (Visible on screen)
+    st.subheader("📊 Combined Laboratory Data")
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Gravel %", f"{gravel:.1f}")
+    c2.metric("Sand %", f"{sand:.1f}")
+    c3.metric("Fines %", f"{fines:.1f}")
+    c4.metric("NMC %", f"{nmc:.1f}")
 
-    if st.button("Generate Final Classification"):
+    c5, c6, c7, c8 = st.columns(4)
+    c5.metric("Cu", f"{cu:.2f}" if cu else "N/A")
+    c6.metric("Cc", f"{cc:.2f}" if cc else "N/A")
+    c7.metric("Sp. Gravity", f"{gs:.2f}")
+    c8.metric("PI %", f"{pi:.1f}")
+
+    # 2. Logic & Persistence
+    if "classified" not in st.session_state:
+        st.session_state.classified = False
+
+    if st.button("🚀 Generate IS Classification", use_container_width=True):
         symbol = ""
-        # 1. COARSE-GRAINED SOILS (Fines < 50%)
+        a_line = 0.73 * (ll - 20)
         if fines < 50:
             prefix = "G" if gravel > sand else "S"
-            
-            # Case A: Fines < 5%
-            if fines < 5:
-                well_graded = (cu >= 4 and 1 <= cc <= 3) if prefix == "G" else (cu >= 6 and 1 <= cc <= 3)
-                symbol = f"{prefix}W" if well_graded else f"{prefix}P"
-            
-            # Case B: Fines > 12%
-            elif fines > 12:
-                a_line = 0.73 * (ll - 20)
+            is_well = (cu >= (4 if prefix=="G" else 6) and 1 <= cc <= 3) if (cu and cc) else False
+            grad = "W" if is_well else "P"
+            if fines < 5: symbol = f"{prefix}{grad}"
+            elif fines > 12: 
                 suffix = "C" if (pi > 7 and pi > a_line) else "M"
                 symbol = f"{prefix}{suffix}"
-            
-            # Case C: Dual Symbols (5% to 12% Fines)
-            else:
-                well_graded = (cu >= 4 and 1 <= cc <= 3) if prefix == "G" else (cu >= 6 and 1 <= cc <= 3)
-                a_line = 0.73 * (ll - 20)
+            else: 
                 suffix = "C" if (pi > 7 and pi > a_line) else "M"
-                grad_sym = "W" if well_graded else "P"
-                symbol = f"{prefix}{grad_sym}-{prefix}{suffix}"
-
-        # 2. FINE-GRAINED SOILS (Fines >= 50%)
+                symbol = f"{prefix}{grad}-{prefix}{suffix}"
         else:
-            a_line = 0.73 * (ll - 20)
-            if ll < 50:
-                if pi > 7 and pi > a_line:
-                    symbol = "CL"
-                elif pi < 4 or pi < a_line:
-                    symbol = "ML"
-                else: 
-                    symbol = "CL-ML" # The "Silty Clay" zone
-            else:
-                if pi > a_line:
-                    symbol = "CH"
-                else:
-                    symbol = "MH"
+            plast = "L" if ll < 35 else "I" if ll <= 50 else "H"
+            kind = "C" if (pi > 7 and pi > a_line) else "M"
+            symbol = f"{kind}{plast}"
+            if 4 <= pi <= 7 and pi >= a_line: symbol = "CL-ML"
 
-        # Fetch description and recommendation
-        desc, rec = USCS_DATA.get(symbol, ("Unknown", "Consult site-specific data."))
+        st.session_state.res_symbol = symbol
+        st.session_state.classified = True
+        st.balloons()
+
+    # 3. Alag-Alag Values Report
+    if st.session_state.classified:
+        symbol = st.session_state.res_symbol
+        desc, rec = IS_DATA.get(symbol, ("Soil Identified", "Refer to IS 1498."))
         
-        st.divider()
-        st.success(f"## Final Symbol: {symbol}")
-        st.write(f"**Description:** {desc}")
-        st.info(f"**Recommendation:** {rec}")
-
-        # PDF Export - Updated to include Gravel and Sand in PDF
-        report_data = {
-            "Liquid Limit": f"{ll:.1f}%", 
-            "Plasticity Index": f"{pi:.1f}%", 
-            "Fines %": f"{fines:.1f}%",
-            "Gravel %": f"{gravel:.1f}%",
-            "Sand %": f"{sand:.1f}%",
-            "Cu": f"{cu:.2f}", 
-            "Cc": f"{cc:.2f}"
+        st.success(f"### Final Symbol: {symbol}")
+        
+        final_table = {
+            "Specific Gravity (G)": f"{gs:.2f}",
+            "Natural Moisture Content": f"{nmc:.2f}%",
+            "Effective Size (D10)": f"{d10} mm",
+            "D30 Size": f"{d30} mm",
+            "D60 Size": f"{d60} mm",
+            "Gravel Content": f"{gravel:.1f}%",
+            "Sand Content": f"{sand:.1f}%",
+            "Fines Content": f"{fines:.1f}%",
+            "Uniformity Coeff (Cu)": f"{cu:.2f}" if cu else "N/A",
+            "Curvature Coeff (Cc)": f"{cc:.2f}" if cc else "N/A"
         }
-        pdf_bytes = create_pdf(report_data, symbol, desc, rec)
-        st.download_button(label="📥 Download PDF Report", data=pdf_bytes, file_name="Classification_Report.pdf", mime="application/pdf")
 
-    if st.button("Back to Home"):
+        pdf_bytes = create_pdf(final_table, symbol, desc, rec)
+        st.download_button("📥 Download Final Report", data=pdf_bytes, file_name=f"DigiSoil_{symbol}.pdf", use_container_width=True)
+
+    st.divider()
+    if st.button("🏠 Back to Home"):
+        st.session_state.classified = False
         st.session_state.nav_choice = "Home"
         st.rerun()
 
