@@ -1,9 +1,9 @@
 import streamlit as st
 import importlib
-import os  # Fixed: Added missing import
+import os
 
-# 1. Setup the Page Branding (The 'Face' of the app)
-# Change 'icon.png' to your actual gallery filename
+# --- 1. APP IDENTITY & FACE ---
+# Ensure this filename matches your GitHub upload exactly!
 LOGO_FILE = "icon.png" 
 
 st.set_page_config(
@@ -12,7 +12,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# Inject PWA Manifest for Mobile/Desktop Installation
+# This makes your gallery image the 'Face' for home-screen installation
 st.markdown(
     f"""
     <link rel="manifest" href="manifest.json">
@@ -21,80 +21,74 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# --- Sidebar Start ---
+# --- 2. MODULE REGISTRY (Must be defined before the sidebar uses it!) ---
+MODULES = {
+    "Grain Size Analysis": {"mod": "gsd", "icon": "📊", "desc": "Sieve analysis & Gradation curves"},
+    "Liquid Limit": {"mod": "liquid_limit", "icon": "💧", "desc": "Casagrande Method (IS 2720 P-5)"},
+    "Plastic Limit": {"mod": "plastic_limit", "icon": "🧪", "desc": "3mm Thread Rolling Test"},
+    "Plasticity Index": {"mod": "plasticity_index", "icon": "📉", "desc": "A-Line & IP Calculation"},
+    "Natural Moisture Content": {"mod": "moisture_content", "icon": "🌡️", "desc": "Field Moisture, Oven Drying Method"},
+    "Specific Gravity": {"mod": "specific_gravity", "icon": "⚖️", "desc": "Pycnometer method"},
+    "Full Classification": {"mod": "full_classification", "icon": "📑", "desc": "Final IS 1498 Symbol Reporting"}
+}
+
+# --- 3. SESSION STATE ---
+if "nav_choice" not in st.session_state:
+    st.session_state.nav_choice = "Home"
+
+# --- 4. SIDEBAR UI ---
 with st.sidebar:
-    # 1. Place the Logo at the VERY TOP
     if os.path.exists(LOGO_FILE):
         st.image(LOGO_FILE, use_container_width=True)
     else:
         st.info("🏗️ DigiSoil Lab Automation")
 
-    # 2. Place the Title right below it
     st.title("DigiSoil '26")
-    
-    # 3. Developer Info
-    st.markdown(f"**Developer:** Diya Sharma")
-    st.markdown("**(BTCE24O1027)**")
-    st.markdown("**Dept:** Civil Engineering")
-    st.markdown("**Institute:** MITS-DU GWALIOR")
+    st.markdown(f"**Developer:** Diya Sharma\n**(BTCE24O1027)**")
+    st.markdown("**Dept:** Civil Engineering\n**Institute:** MITS-DU GWALIOR")
     st.divider()
 
-# --- In app.py Sidebar Section ---
-st.sidebar.subheader("📊 Test Status")
+    # Test Status Indicators
+    st.subheader("📊 Test Status")
+    gsd_status = "✅" if "fines_percent" in st.session_state else "⚪"
+    st.write(f"{gsd_status} Grain Size Analysis")
+    
+    ll_status = "✅" if "liquid_limit_val" in st.session_state else "⚪"
+    st.write(f"{ll_status} Liquid Limit Test")
+    
+    pl_status = "✅" if "plastic_limit_val" in st.session_state else "⚪"
+    st.write(f"{pl_status} Plastic Limit Test")
+    
+    st.divider()
 
-# GSD uses 'fines_percent'
-gsd_status = "✅" if "fines_percent" in st.session_state else "⚪"
-st.sidebar.write(f"{gsd_status} Grain Size Analysis")
+    # Navigation Menu (This will now work because MODULES is defined above!)
+    options = ["Home"] + list(MODULES.keys())
+    current_idx = options.index(st.session_state.nav_choice) if st.session_state.nav_choice in options else 0
+    page = st.sidebar.radio("Navigation Menu", options, index=current_idx)
 
-# LL uses 'liquid_limit_val'
-ll_status = "✅" if "liquid_limit_val" in st.session_state else "⚪"
-st.sidebar.write(f"{ll_status} Liquid Limit Test")
-
-# PL uses 'plastic_limit_val'
-pl_status = "✅" if "plastic_limit_val" in st.session_state else "⚪"
-st.sidebar.write(f"{pl_status} Plastic Limit Test")
-
-st.sidebar.divider()
-options = ["Home"] + list(MODULES.keys())
-current_idx = options.index(st.session_state.nav_choice) if st.session_state.nav_choice in options else 0
-page = st.sidebar.radio("Navigation Menu", options, index=current_idx)
-
-# 5. Main Dashboard UI
+# --- 5. MAIN DASHBOARD ---
 if page == "Home":
-    st.markdown("<h1 class='main-title'>🏗️ DigiSoil Lab Automation</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>🏗️ DigiSoil Lab Automation</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; opacity: 0.7;'>MITS-DU Gwalior | Soil Index Properties Automation</p>", unsafe_allow_html=True)
     st.divider()
 
-    # Layout for 7 modules (using columns)
-    modules_list = list(MODULES.keys())
-    
-    # Grid Logic: 4 on top, 3 on bottom for better balance
+    # Layout for cards
     row1 = st.columns(4)
     row2 = st.columns(3)
     cols = row1 + row2
 
-    for i, mod in enumerate(modules_list):
+    for i, mod in enumerate(list(MODULES.keys())):
         with cols[i]:
-            st.markdown(f"""
-                <div class="module-card">
-                    <h2 style="margin: 0;">{MODULES[mod]['icon']}</h2>
-                    <h5 style="margin: 5px 0;">{mod}</h5>
-                    <p style="font-size: 0.8rem; opacity: 0.8;">{MODULES[mod]['desc']}</p>
-                </div>
-            """, unsafe_allow_html=True)
-            
+            st.info(f"### {MODULES[mod]['icon']} {mod}")
+            st.caption(MODULES[mod]['desc'])
             if st.button(f"Open Test", key=f"btn_{mod}"):
                 st.session_state.nav_choice = mod
                 st.rerun()
-
 else:
-    # 6. Dynamic Module Loader
+    # Module Loader
     mod_name = MODULES[page]["mod"]
     try:
         module = importlib.import_module(f"modules.{mod_name}")
         module.run()
-        
-            
     except Exception as e:
         st.error(f"❌ Error loading module: {e}")
-
