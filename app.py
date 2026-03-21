@@ -8,6 +8,20 @@ st.set_page_config(
     layout="wide"
 )
 
+# This logic injects the "App Face" into the browser's head
+st.markdown(
+    f"""
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    """,
+    unsafe_allow_html=True
+)
+
+# Your existing set_page_config should follow this
+st.set_page_config(page_title="DigiSoil", page_icon="icon.png")
+
 if "nav_choice" not in st.session_state:
     st.session_state.nav_choice = "Home"
 
