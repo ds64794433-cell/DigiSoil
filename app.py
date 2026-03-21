@@ -82,7 +82,7 @@ with st.sidebar:
         st.info("🏗️ DigiSoil Lab Automation")
 
     st.title("DigiSoil '26")
-    st.markdown("**Developer:** Diya Sharma\n**(BTCE24O1027)**\n\n**Dept:** Civil Engineering\n**Institute:** MITS-DU GWALIOR")
+    st.markdown("**Developer:** Diya Sharma\n**(BTCE24O1027)**\n\n**Dept:** Civil Engineering\n\n**Institute:** MITS-DU GWALIOR")
     st.divider()
 
     st.subheader("📊 Test Status")
