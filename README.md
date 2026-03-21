@@ -15,4 +15,6 @@ DigiSoil is a Python-based interactive application designed to automate soil ind
 - **Libraries:** Pandas, NumPy, Matplotlib, FPDF2
 
 ## 👨‍💻 Developed By
-**Diya Sharma**/n/nDepartment of Civil Engineering @ MITS-DU Gwalior
+**Diya Sharma**
+**Department of Civil Engineering**
+**MITS-DU Gwalior**
