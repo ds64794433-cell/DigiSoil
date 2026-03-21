@@ -1,20 +1,19 @@
 import streamlit as st
 import importlib
 
-# Force the browser to recognize your branding
-st.markdown(
-    f"""
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="digisoil_logo.png.jpeg">
-    """,
-    unsafe_allow_html=True
-)
+# Define the exact name of your gallery image
+LOGO_FILE = "digisoil_logo" 
 
-# This changes the Browser Tab name and icon
-st.set_page_config(
-    page_title="DigiSoil",
-    page_icon="digisoil_logo.png.jpeg"
-)
+if os.path.exists(LOGO_FILE):
+    # This replaces the blue error with your actual gallery image
+    st.sidebar.image(LOGO_FILE, use_container_width=True)
+else:
+    # This keeps the sidebar clean if the file is missing
+    st.sidebar.info("🏗️ DigiSoil Lab Automation")
+
+st.sidebar.title("DigiSoil '26")
+st.sidebar.write(f"Developer: **Diya Sharma**")
+st.sidebar.write("(BTCE2401027)")
 
 if "nav_choice" not in st.session_state:
     st.session_state.nav_choice = "Home"
