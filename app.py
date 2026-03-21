@@ -1,86 +1,33 @@
 import streamlit as st
 import importlib
+import os  # Fixed: Added missing import
 
-# Define the exact name of your gallery image
-LOGO_FILE = "digisoil_logo" 
+# 1. Setup the Page Branding (The 'Face' of the app)
+# Change 'icon.png' to your actual gallery filename
+LOGO_FILE = "icon.png" 
 
-if os.path.exists(LOGO_FILE):
-    # This replaces the blue error with your actual gallery image
-    st.sidebar.image(LOGO_FILE, use_container_width=True)
-else:
-    # This keeps the sidebar clean if the file is missing
-    st.sidebar.info("🏗️ DigiSoil Lab Automation")
+st.set_page_config(
+    page_title="DigiSoil '26",
+    page_icon=LOGO_FILE if os.path.exists(LOGO_FILE) else "🏗️",
+    layout="wide"
+)
 
-st.sidebar.title("DigiSoil '26")
-st.sidebar.write(f"Developer: **Diya Sharma**")
-st.sidebar.write("(BTCE2401027)")
+# Inject PWA Manifest for Mobile/Desktop Installation
+st.markdown(
+    f"""
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="{LOGO_FILE}">
+    """,
+    unsafe_allow_html=True
+)
 
-if "nav_choice" not in st.session_state:
-    st.session_state.nav_choice = "Home"
-
-# 2. Refined CSS (Snaps Button to Card)
-st.markdown("""
-    <style>
-    .stApp {
-        background: linear-gradient(135deg, rgba(30,58,138,0.05) 0%, rgba(255,75,43,0.05) 100%);
-    }
-    
-    .module-card {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        padding: 1.5rem;
-        border-radius: 15px 15px 0 0; 
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-top: 5px solid #FF4B2B;
-        text-align: center;
-        height: 180px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    div.stButton > button {
-        background-color: #FF4B2B !important;
-        color: white !important;
-        border-radius: 0 0 15px 15px !important; 
-        font-weight: 600 !important;
-        border: none !important;
-        width: 100% !important;
-        height: 42px !important;
-        margin-top: -5px !important; 
-        transition: 0.3s;
-    }
-
-    div.stButton > button:hover {
-        background-color: #1E3A8A !important;
-        transform: translateY(2px);
-    }
-    
-    .main-title {
-        text-align: center;
-        font-weight: 800;
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# 3. Module Registry (Liquid and Plastic Separated)
-MODULES = {
-    "Grain Size Analysis": {"mod": "gsd", "icon": "📊", "desc": "Sieve analysis & Gradation curves"},
-    "Liquid Limit": {"mod": "liquid_limit", "icon": "💧", "desc": "Casagrande Method (IS 2720 P-5)"},
-    "Plastic Limit": {"mod": "plastic_limit", "icon": "🧪", "desc": "3mm Thread Rolling Test"},
-    "Plasticity Index": {"mod": "plasticity_index", "icon": "📉", "desc": "A-Line & IP Calculation"},
-    "Natural Moisture Content": {"mod": "moisture_content", "icon": "🌡️", "desc": "Field Moisture, Oven Drying Method"},
-    "Specific Gravity": {"mod": "specific_gravity", "icon": "⚖️", "desc": "Pycnometer method"},
-    "Full Classification": {"mod": "full_classification", "icon": "📑", "desc": "Final IS 1498 Symbol Reporting"}
-}
-
-# 4. Sidebar Navigation
+# --- Sidebar Start ---
 with st.sidebar:
     # 1. Place the Logo at the VERY TOP
-    try:
-        st.image("assets/mits_logo.png", width=80)
-    except:
-        st.info("Logo file not found in folder.")
+    if os.path.exists(LOGO_FILE):
+        st.image(LOGO_FILE, use_container_width=True)
+    else:
+        st.info("🏗️ DigiSoil Lab Automation")
 
     # 2. Place the Title right below it
     st.title("DigiSoil '26")
