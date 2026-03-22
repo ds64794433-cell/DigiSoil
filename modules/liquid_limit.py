@@ -55,26 +55,38 @@ def run():
         if correlation > 0:
             st.warning("⚠️ Warning: Data shows water content increasing with blow count. This is physically incorrect for a standard LL test.")
 
-        # 3. MATH: REGRESSION
-        try:
-            log_n = np.log10(blows.astype(float))
-            m, c = np.polyfit(log_n, water_contents, 1)
-            ll_25 = m * np.log10(25) + c
+        # 3. MATH: REGRESSION WITH SLOPE VALIDATION
+try:
+    log_n = np.log10(blows.astype(float))
+    # m is the slope (Flow Index), c is the intercept
+    m, c = np.polyfit(log_n, water_contents, 1)
+    
+    # CRITICAL CHECK: In LL test, the slope 'm' MUST be negative.
+    # Because as N increases, Water Content must decrease.
+    if m >= 0:
+        st.error("❌ **Data Trend Error:** Your water content is increasing with the number of blows. "
+                 "The Liquid Limit cannot be calculated because the 'Flow Curve' is upside down.")
+        st.info("Check if you swapped the weights for the 18-blow trial and the 28-blow trial.")
+        return
 
-            # CHECK 4: Result Validation
-            if ll_25 <= 0:
-                st.error(f"❌ Calculated LL is {ll_25:.2f}%. Check if your weights or blow counts are swapped.")
-                return
+    ll_25 = m * np.log10(25) + c
 
-            st.session_state.ll_plot_data = {
-                'blows': blows, 'wc': water_contents, 
-                'm': m, 'c': c, 'll': ll_25
-            }
-            st.session_state.liquid_limit_val = round(ll_25, 2)
-            st.rerun() 
+    # FINAL SANITY CHECK
+    if ll_25 <= 0:
+        st.error(f"❌ **Physical Error:** The calculated LL is {ll_25:.2f}%. "
+                 "This usually happens if your water contents are extremely low (below 10%).")
+        return
 
-        except Exception as e:
-            st.error(f"📈 Regression Error: {e}")
+    # If all checks pass, save to state
+    st.session_state.liquid_limit_val = round(ll_25, 2)
+    st.session_state.ll_plot_data = {
+        'blows': blows, 'wc': water_contents, 
+        'm': m, 'c': c, 'll': ll_25
+    }
+    st.rerun()
+
+except np.RankWarning:
+    st.error("❌ **Math Error:** Your data points are too scattered to create a line.")
 
     # --- 4. PERSISTENT DISPLAY ---
     if "liquid_limit_val" in st.session_state:
