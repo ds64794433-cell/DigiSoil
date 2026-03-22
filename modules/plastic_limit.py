@@ -17,30 +17,31 @@ def run():
     st.subheader("Laboratory Data")
     edited_df = st.data_editor(st.session_state.pl_data_input, num_rows="fixed", key="pl_editor")
 
-    if st.button("🚀 Calculate Plastic Limit"):
-        # Save edited data back to session state
+        if st.button("🚀 Calculate Plastic Limit"):
         st.session_state.pl_data_input = edited_df
-        
         df_num = edited_df.apply(pd.to_numeric, errors='coerce')
-        w_cont = df_num["Container Wt (g)"].values
-        w_wet = df_num["Wet Soil + Cont. (g)"].values
-        w_dry = df_num["Dry Soil + Cont. (g)"].values
+        w_cont, w_wet, w_dry = df_num.iloc[:,0].values, df_num.iloc[:,1].values, df_num.iloc[:,2].values
         
         water_contents = []
         for i in range(2):
+            # 1. Physical Check: Wet soil must be heavier than dry soil
+            if w_dry[i] > w_wet[i]:
+                st.error(f"❌ Trial {i+1}: Dry weight cannot be more than Wet weight. Check your entries!")
+                return
+            
+            # 2. Physical Check: Dry soil + container must be heavier than empty container
+            if w_cont[i] >= w_dry[i]:
+                st.error(f"❌ Trial {i+1}: Container weight is too high. Dry soil must weigh something!")
+                return
+
             w_water = w_wet[i] - w_dry[i]
             w_soil = w_dry[i] - w_cont[i]
-            if w_soil <= 0:
-                st.error(f"❌ Trial {i+1}: Dry soil weight must be positive.")
-                return
+            
             water_contents.append((w_water / w_soil) * 100)
         
-        # --- SAVE RESULTS ---
         avg_pl = round(np.mean(water_contents), 2)
         st.session_state["plastic_limit_val"] = avg_pl
         st.session_state["pl_trials"] = water_contents
-        
-        # Trigger immediate sidebar update
         st.rerun() 
 
     # --- PERSISTENT DISPLAY (Outside Button) ---
