@@ -39,24 +39,18 @@ def run():
 
         water_contents = []
         for i in range(len(df_clean)):
-            # --- THE "ANTI-NEGATIVE" GATE ---
-            # Check for zero inputs
-            if w_wet[i] == 0 or w_dry[i] == 0 or w_cont[i] == 0:
-                st.error(f"❌ Trial {i+1}: Weights cannot be zero. Please enter valid lab measurements.")
-                return
-
-            # Wet soil MUST be heavier than dry soil
-            if w_dry[i] >= w_wet[i]:
-                st.error(f"❌ Trial {i+1}: Dry weight ({w_dry[i]}g) cannot be ≥ Wet weight ({w_wet[i]}g). Soil must lose weight in the oven!")
-                return
-            
-            # Dry soil + Container MUST be heavier than the empty container
-            if w_cont[i] >= w_dry[i]:
-                st.error(f"❌ Trial {i+1}: Container weight ({w_cont[i]}g) cannot be ≥ Dry Soil + Cont. ({w_dry[i]}g).")
-                return
+            # 1. THE CRITICAL CHECK
+            if w_dry[i] > w_wet[i]:
+                st.error(f"❌ Error in Row {i}: Dry weight ({w_dry[i]}g) is more than Wet weight ({w_wet[i]}g). Please fix this to calculate.")
+                return # This stops the calculation entirely
 
             w_water = w_wet[i] - w_dry[i]
             w_soil = w_dry[i] - w_cont[i]
+            
+            if w_soil <= 0:
+                st.error(f"❌ Error in Row {i}: Soil weight is zero or negative. Check Container weight.")
+                return
+            
             water_contents.append((w_water / w_soil) * 100)
 
         # 3. MATH: REGRESSION
