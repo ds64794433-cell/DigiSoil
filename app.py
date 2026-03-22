@@ -96,7 +96,7 @@ with st.sidebar:
     st.write(f"{'✅' if 'liquid_limit_val' in st.session_state else '⚪'} Liquid Limit Test")
     
     # FIXED: Ensure your plastic_limit.py saves to 'plastic_limit_val'
-    st.write(f"{'✅' if 'pl_val' in st.session_state else '⚪'} Plastic Limit Test")
+    st.write(f"{'✅' if 'plastic_limit_val' in st.session_state else '⚪'} Plastic Limit Test")
     st.write(f"{'✅' if 'pi_result' in st.session_state else '⚪'} Plasticity Index")
     
     # NEW: Added Specific Gravity status
