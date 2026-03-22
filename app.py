@@ -1,5 +1,9 @@
 import streamlit as st
 import importlib
+import os  # <--- CRITICAL: This must be here!
+
+# 1. APP IDENTITY
+LOGO_FILE = "mits_logo.png"
 
 # 1. Page Configuration
 st.set_page_config(
