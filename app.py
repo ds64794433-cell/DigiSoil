@@ -67,13 +67,13 @@ MODULES = {
     "Full Classification": {"mod": "full_classification", "icon": "📑", "desc": "Final IS 1498 Symbol Reporting"}
 }
 
-# 1. FIXED LOGO PATH
-    # Since your file is 'mits_logo.png' in the main folder:
+# --- Sidebar Start ---
+with st.sidebar:
+    # 4 SPACES OR 1 TAB BEFORE THE 'if'
     if os.path.exists("mits_logo.png"):
         st.image("mits_logo.png", width=120)
     else:
-        # This shows if there is a typo in the filename on GitHub
-        st.error("Logo file 'mits_logo.png' not found.")
+        st.info("🏗️ DigiSoil '26")
 
     # 2. Place the Title right below it
     st.title("DigiSoil '26")
