@@ -67,13 +67,13 @@ MODULES = {
     "Full Classification": {"mod": "full_classification", "icon": "📑", "desc": "Final IS 1498 Symbol Reporting"}
 }
 
-# 4. Sidebar Navigation
-with st.sidebar:
-    # 1. Place the Logo at the VERY TOP
-    try:
-        st.image("DigiSoil/mits_logo.png", width=80)
-    except:
-        st.info("Logo file not found in folder.")
+# 1. FIXED LOGO PATH
+    # Since your file is 'mits_logo.png' in the main folder:
+    if os.path.exists("mits_logo.png"):
+        st.image("mits_logo.png", width=120)
+    else:
+        # This shows if there is a typo in the filename on GitHub
+        st.error("Logo file 'mits_logo.png' not found.")
 
     # 2. Place the Title right below it
     st.title("DigiSoil '26")
@@ -85,26 +85,26 @@ with st.sidebar:
     st.markdown("**Institute:** MITS-DU GWALIOR")
     st.divider()
 
-# --- In app.py Sidebar Section ---
-st.sidebar.subheader("📊 Test Status")
-
-# GSD uses 'fines_percent'
-gsd_status = "✅" if "fines_percent" in st.session_state else "⚪"
-st.sidebar.write(f"{gsd_status} Grain Size Analysis")
-
-# LL uses 'liquid_limit_val'
-ll_status = "✅" if "liquid_limit_val" in st.session_state else "⚪"
-st.sidebar.write(f"{ll_status} Liquid Limit Test")
-
-# PL uses 'plastic_limit_val'
-pl_status = "✅" if "plastic_limit_val" in st.session_state else "⚪"
-st.sidebar.write(f"{pl_status} Plastic Limit Test")
-
-st.sidebar.divider()
-options = ["Home"] + list(MODULES.keys())
-current_idx = options.index(st.session_state.nav_choice) if st.session_state.nav_choice in options else 0
-page = st.sidebar.radio("Navigation Menu", options, index=current_idx)
-
+# 2. UPDATED TEST STATUS (Fixed PL and added Specific Gravity)
+    st.subheader("📊 Test Status")
+    
+    st.write(f"{'✅' if 'fines_percent' in st.session_state else '⚪'} Grain Size Analysis")
+    st.write(f"{'✅' if 'liquid_limit_val' in st.session_state else '⚪'} Liquid Limit Test")
+    
+    # FIXED: Ensure your plastic_limit.py saves to 'plastic_limit_val'
+    st.write(f"{'✅' if 'plastic_limit_val' in st.session_state else '⚪'} Plastic Limit Test")
+    
+    # NEW: Added Specific Gravity status
+    st.write(f"{'✅' if 'gs_result' in st.session_state else '⚪'} Specific Gravity")
+    
+    st.divider()
+# 3. NAVIGATION
+    options = ["Home"] + list(MODULES.keys())
+    # Ensure nav_choice stays consistent
+    if st.session_state.nav_choice not in options:
+        st.session_state.nav_choice = "Home"
+        
+    page = st.sidebar.radio("Navigation Menu", options, index=options.index(st.session_state.nav_choice))
 # 5. Main Dashboard UI
 if page == "Home":
     st.markdown("<h1 class='main-title'>🏗️ DigiSoil Lab Automation</h1>", unsafe_allow_html=True)
