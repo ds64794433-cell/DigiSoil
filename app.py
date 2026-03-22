@@ -100,6 +100,7 @@ with st.sidebar:
     
     # NEW: Added Specific Gravity status
     st.write(f"{'✅' if 'gs_result' in st.session_state else '⚪'} Specific Gravity")
+    st.write(f"{'✅' if 'gs_result' in st.session_state else '⚪'} Specific Gravity")
     
     st.divider()
 # 3. NAVIGATION
