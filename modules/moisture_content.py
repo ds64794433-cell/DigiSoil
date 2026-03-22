@@ -11,8 +11,6 @@ def run():
     # 1. Initialize Table
     if "nmc_data" not in st.session_state:
         st.session_state.nmc_data = pd.DataFrame({
-            "Sample ID": ["Core-01", "Core-02"],
-            "Container No.": ["M1", "M2"],
             "Wt. of Container (g)": [0.0, 0.0],
             "Wt. of Wet Soil + Cont. (g)": [0.0, 0.0],
             "Wt. of Dry Soil + Cont. (g)": [0.0, 0.0]
