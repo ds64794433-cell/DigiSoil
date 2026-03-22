@@ -57,7 +57,6 @@ def run():
         
         st.write("---")
         st.success(f"✅ Specific Gravity ($G_s$) = **{gs_avg:.3f}**")
-        st.balloons() # Your requested celebration!
 
         col1, col2 = st.columns([1, 2])
         col1.metric("Final $G_s$", f"{gs_avg}")
