@@ -97,10 +97,11 @@ with st.sidebar:
     
     # FIXED: Ensure your plastic_limit.py saves to 'plastic_limit_val'
     st.write(f"{'✅' if 'pl_val' in st.session_state else '⚪'} Plastic Limit Test")
+    st.write(f"{'✅' if 'pl_val' in st.session_state else '⚪'} Plastic Limit Test")
     
     # NEW: Added Specific Gravity status
     st.write(f"{'✅' if 'gs_result' in st.session_state else '⚪'} Specific Gravity")
-    st.write(f"{'✅' if 'gs_result' in st.session_state else '⚪'} Specific Gravity")
+    st.write(f"{'✅' if 'nmc_result' in st.session_state else '⚪'} Natural Moisture Content")
     
     st.divider()
 # 3. NAVIGATION
