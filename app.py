@@ -71,7 +71,7 @@ MODULES = {
 with st.sidebar:
     # 1. Place the Logo at the VERY TOP
     try:
-        st.image("assets/mits_logo.png", width=80)
+        st.image("DigiSoil/mits_logo.png", width=80)
     except:
         st.info("Logo file not found in folder.")
 
