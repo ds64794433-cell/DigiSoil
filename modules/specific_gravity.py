@@ -62,7 +62,7 @@ def run():
         st.session_state["gs_result"] = gs_avg # This saves it to the "brain" for the sidebar
         
         st.success(f"✅ Average Specific Gravity ($G_s$) = **{gs_avg:.3f}**")
-        st.balloons()
+        st.rerun()
 
         # 5. Engineering Context
         st.divider()
