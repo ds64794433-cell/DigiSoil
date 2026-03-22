@@ -10,7 +10,7 @@ def run():
 
     st.write("Enter laboratory data below. Ensure all columns in at least 3 rows are filled.")
 
-    # 1. INITIALIZE TABLE (Persistent in session state)
+    # 1. INITIALIZE TABLE
     if "ll_data_input" not in st.session_state:
         st.session_state.ll_data_input = pd.DataFrame({
             "No. of Blows": [28, 22, 18],
@@ -23,11 +23,11 @@ def run():
     edited_df = st.data_editor(st.session_state.ll_data_input, num_rows="fixed", key="ll_editor")
 
     if st.button("🚀 Calculate Liquid Limit"):
-        # Save input to state
         st.session_state.ll_data_input = edited_df
         
-        # 2. CLEAN AND VALIDATE
+        # 2. CLEAN AND STRICT VALIDATION
         df_clean = edited_df.apply(pd.to_numeric, errors='coerce').dropna()
+        
         if len(df_clean) < 3:
             st.error("❌ Please enter at least 3 complete rows of data.")
             return
@@ -39,12 +39,20 @@ def run():
 
         water_contents = []
         for i in range(len(df_clean)):
-            # --- PHYSICAL SANITY CHECKS ---
-            if w_dry[i] > w_wet[i]:
-                st.error(f"❌ Trial {i+1}: Dry weight ({w_dry[i]}g) cannot be more than Wet weight ({w_wet[i]}g). Check for entry errors!")
+            # --- THE "ANTI-NEGATIVE" GATE ---
+            # Check for zero inputs
+            if w_wet[i] == 0 or w_dry[i] == 0 or w_cont[i] == 0:
+                st.error(f"❌ Trial {i+1}: Weights cannot be zero. Please enter valid lab measurements.")
                 return
+
+            # Wet soil MUST be heavier than dry soil
+            if w_dry[i] >= w_wet[i]:
+                st.error(f"❌ Trial {i+1}: Dry weight ({w_dry[i]}g) cannot be ≥ Wet weight ({w_wet[i]}g). Soil must lose weight in the oven!")
+                return
+            
+            # Dry soil + Container MUST be heavier than the empty container
             if w_cont[i] >= w_dry[i]:
-                st.error(f"❌ Trial {i+1}: Container weight is higher than Dry Soil weight. Check your entries!")
+                st.error(f"❌ Trial {i+1}: Container weight ({w_cont[i]}g) cannot be ≥ Dry Soil + Cont. ({w_dry[i]}g).")
                 return
 
             w_water = w_wet[i] - w_dry[i]
@@ -57,7 +65,12 @@ def run():
             m, c = np.polyfit(log_n, water_contents, 1)
             ll_25 = m * np.log10(25) + c
 
-            # SAVE RESULTS (Sidebar status turns green ✅)
+            # Final safety check on the result
+            if ll_25 <= 0:
+                st.error("❌ Calculated Liquid Limit is negative. Please check if your 'Number of Blows' and 'Weights' are logically aligned.")
+                return
+
+            # SAVE RESULTS
             st.session_state.liquid_limit_val = round(ll_25, 2)
             st.session_state.ll_plot_data = {
                 'blows': blows, 
@@ -70,7 +83,7 @@ def run():
         except Exception as e:
             st.error(f"📈 Regression Error: {e}")
 
-    # --- 4. PERSISTENT DISPLAY (Outside Button) ---
+    # --- 4. PERSISTENT DISPLAY ---
     if "liquid_limit_val" in st.session_state:
         data = st.session_state.ll_plot_data
         ll_val = data['ll']
@@ -80,18 +93,22 @@ def run():
         
         # Plotting
         fig, ax = plt.subplots(figsize=(8, 5))
-        x_fit = np.logspace(np.log10(min(data['blows'])), np.log10(max(data['blows'])), 100)
+        # Ensure log scale handles range correctly
+        x_min, x_max = max(1, min(data['blows'])), max(data['blows'])
+        x_fit = np.logspace(np.log10(x_min*0.8), np.log10(x_max*1.2), 100)
         y_fit = data['m'] * np.log10(x_fit) + data['c']
         
         ax.semilogx(x_fit, y_fit, color='#FF4B2B', label='Flow Curve', linewidth=2)
         ax.scatter(data['blows'], data['wc'], color='#1E3A8A', s=100, label='Trials', zorder=5)
         
-        # Intercepts
+        # Intercepts at N=25
         ax.axvline(25, color='green', linestyle='--', alpha=0.5)
         ax.axhline(ll_val, color='green', linestyle='--', alpha=0.5)
-        ax.set_xlabel("Number of Blows (N) - Log Scale")
-        ax.set_ylabel("Water Content (%)")
+        
+        ax.set_xlabel("Number of Blows (N) - Log Scale", fontweight='bold')
+        ax.set_ylabel("Water Content (%)", fontweight='bold')
         ax.xaxis.set_major_formatter(ScalarFormatter())
+        ax.grid(True, which='both', linestyle=':', alpha=0.6)
         ax.legend()
         st.pyplot(fig)
 
@@ -99,6 +116,3 @@ def run():
     if st.button("🏠 Back to Home"):
         st.session_state.nav_choice = "Home"
         st.rerun()
-
-if __name__ == "__main__":
-    run()
