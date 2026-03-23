@@ -117,19 +117,22 @@ def show_developer_info():
     img_mohit = get_image_base64("mohit_sir.jpg")
     img_sanjay = get_image_base64("sanjay_sir.webp")
 
+    # Use this inside your fac-grid markdown to ensure photos are perfectly aligned
     st.markdown(f"""
         <div class="fac-grid">
             <div class="fac-card">
-                <img src="data:image/jpeg;base64,{img_mohit if img_mohit else ''}" style="width:100%; height:140px; border-radius:10px; object-fit:cover; margin-bottom:10px;">
+                <img src="data:image/jpeg;base64,{img_mohit if img_mohit else ''}" 
+                     style="width:100%; height:160px; border-radius:10px; object-fit:cover;">
                 <div class="fac-name">Dr. Mohit Kumar</div>
-                <div class="fac-title">ASSISTANT PROFESSOR</div>
-                <div class="fac-dept">Dept: Civil Engineering</div>
+                <div class="fac-title">Assistant Professor</div>
+                <div class="fac-dept">Department of Civil Engineering</div>
             </div>
             <div class="fac-card">
-                <img src="data:image/webp;base64,{img_sanjay if img_sanjay else ''}" style="width:100%; height:140px; border-radius:10px; object-fit:cover; margin-bottom:10px;">
+                <img src="data:image/webp;base64,{img_sanjay if img_sanjay else ''}" 
+                     style="width:100%; height:160px; border-radius:10px; object-fit:cover;">
                 <div class="fac-name">Dr. Sanjay Tiwari</div>
-                <div class="fac-title">PROF. & HEAD</div>
-                <div class="fac-dept">Dept: Civil Engineering</div>
+                <div class="fac-title">Prof. & Head</div>
+                <div class="fac-dept">Department of Civil Engineering</div>
             </div>
         </div>
     """, unsafe_allow_html=True)
