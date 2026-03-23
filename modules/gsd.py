@@ -30,7 +30,7 @@ def run():
     # 1. INITIALIZE MASTER STORAGE
     if "gsd_master_v12" not in st.session_state:
         st.session_state.gsd_master_v12 = pd.DataFrame({
-            "Sieve Size (mm)": [4.75, 2.36, 1.18, 0.600, 0.425, 0.212, 0.150, 0.075, 0.001],
+            "Sieve Size (mm)": [4.75, 2.36, 1.18, 0.600, 0.425, 0.212, 0.150, 0.075, Pan],
             "Weight Retained (g)": [0.0] * 9
         })
     
