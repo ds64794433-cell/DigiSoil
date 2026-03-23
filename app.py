@@ -20,104 +20,66 @@ def get_image_base64(path):
 
 @st.dialog("Developer & Faculty Mentors")
 def show_developer_info():
+    # 1. CSS for visibility and spacing
     st.markdown("""
         <style>
-        .dev-header {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-            margin-bottom: 20px;
-            padding: 10px;
+        .dev-header { display: flex; align-items: center; gap: 25px; margin-bottom: 20px; padding: 10px; }
+        .dev-img-box { 
+            width: 150px; height: 170px; border-radius: 15px; overflow: hidden; 
+            border: 3px solid #FF4B2B; flex-shrink: 0; box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
         }
-        .dev-img-box {
-            width: 150px;
-            height: 170px;
-            border-radius: 15px;
-            overflow: hidden;
-            border: 3px solid #FF4B2B;
-            flex-shrink: 0;
-            box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+        .dev-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .dev-name-main { font-size: 2.2rem; font-weight: 900; color: #60A5FA; line-height: 1.1; margin-bottom: 5px; }
+        .dev-details { font-size: 1rem; color: #E5E7EB; line-height: 1.5; }
+        
+        /* Faculty Grid Styling */
+        .fac-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: center; }
+        .fac-card { 
+            background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 15px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
         }
-        .dev-img-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        /* ADAPTIVE TEXT COLORS */
-        .dev-name-main {
-            font-size: 2.2rem;
-            font-weight: 900;
-            /* Uses theme blue in light, bright blue in dark */
-            color: #3b82f6; 
-            line-height: 1.1;
-            margin-bottom: 8px;
-        }
-        .dev-details {
-            font-size: 1rem;
-            /* This variable automatically flips between black and white */
-            color: var(--text-color); 
-            line-height: 1.5;
-        }
-        /* FACULTY CARDS */
-        .fac-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .fac-card {
-            /* Uses a transparent background that works in both modes */
-            background: rgba(128, 128, 128, 0.1); 
-            padding: 15px;
-            border-radius: 15px;
-            border: 1px solid rgba(128, 128, 128, 0.2);
-            text-align: center;
-            color: var(--text-color);
-        }
-        .fac-img-small {
-            width: 100%;
-            height: 140px;
-            border-radius: 10px;
-            object-fit: cover;
-            margin-bottom: 10px;
-        }
+        .fac-name { font-weight: 800; font-size: 1.1rem; color: #FFFFFF; margin-top: 10px; }
+        .fac-title { color: #FF4B2B; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; }
+        .fac-dept { color: #BDC3C7; font-size: 0.8rem; margin-top: 2px; opacity: 0.9; } /* Brightened for dark mode */
         </style>
     """, unsafe_allow_html=True)
 
+    # 2. Developer Header
     img_diya = get_image_base64("diyaa.jpeg")
-    
     st.markdown(f"""
         <div class="dev-header">
-            <div class="dev-img-box">
-                <img src="data:image/jpeg;base64,{img_diya if img_diya else ''}">
-            </div>
+            <div class="dev-img-box"><img src="data:image/jpeg;base64,{img_diya if img_diya else ''}"></div>
             <div class="dev-info-box">
                 <div class="dev-name-main">Diya Sharma</div>
                 <div class="dev-details">
-                    📍 <strong>Graphic Head</strong> | The Bhagwat Club MITS-DU<br>
-                    🎓 2nd Year B.Tech (Civil Engineering)<br>
-                    🏆 <span style="color: #FF4B2B; font-weight: bold;">8.6 CGPA</span> 
+                    📍 <strong>Graphic Head</strong> | The Bhagwat Club<br>
+                    🎓 2nd Year B.Tech (Civil Eng.)<br>
+                    🏆 <strong>8.6 CGPA</strong>
                 </div>
             </div>
         </div>
     """, unsafe_allow_html=True)
 
     st.divider()
-    st.markdown("<p style='text-align: center; font-weight: 700; opacity: 0.7;'>UNDER THE GUIDANCE OF</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; font-weight: 700; color: #9CA3AF;'>UNDER THE GUIDANCE OF</p>", unsafe_allow_html=True)
     
+    # 3. Faculty Grid with Department Added
     img_mohit = get_image_base64("mohit_sir.jpg")
     img_sanjay = get_image_base64("sanjay_sir.webp")
 
     st.markdown(f"""
         <div class="fac-grid">
             <div class="fac-card">
-                <img src="data:image/jpeg;base64,{img_mohit if img_mohit else ''}" class="fac-img-small">
-                <div style="font-weight: 800;">Dr. Mohit Kumar</div>
-                <div style="color: #FF4B2B; font-size: 0.8rem; font-weight: 700;">ASSISTANT PROFESSOR</div>
+                <img src="data:image/jpeg;base64,{img_mohit if img_mohit else ''}" style="width:100%; height:140px; border-radius:10px; object-fit:cover;">
+                <div class="fac-name">Dr. Mohit Kumar</div>
+                <div class="fac-title">Assistant Professor</div>
+                <div class="fac-dept">Dept. of Civil Engineering</div>
             </div>
             <div class="fac-card">
-                <img src="data:image/webp;base64,{img_sanjay if img_sanjay else ''}" class="fac-img-small">
-                <div style="font-weight: 800;">Dr. Sanjay Tiwari</div>
-                <div style="color: #FF4B2B; font-size: 0.8rem; font-weight: 700;">PROF. & HEAD</div>
+                <img src="data:image/webp;base64,{img_sanjay if img_sanjay else ''}" style="width:100%; height:140px; border-radius:10px; object-fit:cover;">
+                <div class="fac-name">Dr. Sanjay Tiwari</div>
+                <div class="fac-title">Prof. & Head</div>
+                <div class="fac-dept">Dept. of Civil Engineering</div>
             </div>
         </div>
     """, unsafe_allow_html=True)
