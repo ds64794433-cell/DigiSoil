@@ -20,35 +20,84 @@ def get_image_base64(path):
 
 @st.dialog("Developer & Faculty Mentors")
 def show_developer_info():
-    # 1. CSS for visibility and spacing
+    # 1. UPDATED CSS FOR BETTER VISIBILITY
     st.markdown("""
         <style>
-        .dev-header { display: flex; align-items: center; gap: 25px; margin-bottom: 20px; padding: 10px; }
-        .dev-img-box { 
-            width: 150px; height: 170px; border-radius: 15px; overflow: hidden; 
-            border: 3px solid #FF4B2B; flex-shrink: 0; box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
+        .dev-header {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 20px;
+            padding: 10px;
         }
-        .dev-img-box img { width: 100%; height: 100%; object-fit: cover; }
-        .dev-name-main { font-size: 2.2rem; font-weight: 900; color: #60A5FA; line-height: 1.1; margin-bottom: 5px; }
-        .dev-details { font-size: 1rem; color: #E5E7EB; line-height: 1.5; }
-        
-        /* Faculty Grid Styling */
-        .fac-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: center; }
-        .fac-card { 
-            background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 15px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
+        .dev-img-box {
+            width: 150px;
+            height: 170px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 3px solid #FF4B2B;
+            flex-shrink: 0;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
         }
-        .fac-name { font-weight: 800; font-size: 1.1rem; color: #FFFFFF; margin-top: 10px; }
-        .fac-title { color: #FF4B2B; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; }
-        .fac-dept { color: #BDC3C7; font-size: 0.8rem; margin-top: 2px; opacity: 0.9; } /* Brightened for dark mode */
+        .dev-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .dev-name-main {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #60A5FA; /* Brighter Blue for Dark Mode */
+            line-height: 1.1;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        /* Style for the details text */
+        .dev-details {
+            font-size: 1rem;
+            color: #E5E7EB; /* Off-white/Light gray */
+            line-height: 1.5;
+        }
+        .dev-details strong {
+            color: #FFA500; /* Orange highlight for titles */
+        }
+        .fac-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            text-align: center;
+        }
+        .fac-card {
+            background: rgba(255, 255, 255, 0.05); /* Semi-transparent background */
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .fac-name {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #FFFFFF; /* Pure white name */
+        }
+        .fac-title {
+            color: #FF4B2B; /* Vibrant accent red */
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+        .fac-dept {
+            font-size: 0.75rem;
+            color: #9CA3AF; /* Muted gray for secondary info */
+        }
         </style>
     """, unsafe_allow_html=True)
 
-    # 2. Developer Header
+    # 2. THE DEVELOPER SECTION
     img_diya = get_image_base64("diyaa.jpeg")
     st.markdown(f"""
         <div class="dev-header">
-            <div class="dev-img-box"><img src="data:image/jpeg;base64,{img_diya if img_diya else ''}"></div>
+            <div class="dev-img-box">
+                <img src="data:image/jpeg;base64,{img_diya if img_diya else ''}">
+            </div>
             <div class="dev-info-box">
                 <div class="dev-name-main">Diya Sharma</div>
                 <div class="dev-details">
@@ -61,25 +110,26 @@ def show_developer_info():
     """, unsafe_allow_html=True)
 
     st.divider()
+
+    # 3. THE FACULTY SECTION
     st.markdown("<p style='text-align: center; font-weight: 700; color: #9CA3AF;'>UNDER THE GUIDANCE OF</p>", unsafe_allow_html=True)
     
-    # 3. Faculty Grid with Department Added
     img_mohit = get_image_base64("mohit_sir.jpg")
     img_sanjay = get_image_base64("sanjay_sir.webp")
 
     st.markdown(f"""
         <div class="fac-grid">
             <div class="fac-card">
-                <img src="data:image/jpeg;base64,{img_mohit if img_mohit else ''}" style="width:100%; height:140px; border-radius:10px; object-fit:cover;">
+                <img src="data:image/jpeg;base64,{img_mohit if img_mohit else ''}" style="width:100%; height:140px; border-radius:10px; object-fit:cover; margin-bottom:10px;">
                 <div class="fac-name">Dr. Mohit Kumar</div>
-                <div class="fac-title">Assistant Professor</div>
-                <div class="fac-dept">Dept. of Civil Engineering</div>
+                <div class="fac-title">ASSISTANT PROFESSOR</div>
+                <div class="fac-dept">Dept: Civil Engineering</div>
             </div>
             <div class="fac-card">
-                <img src="data:image/webp;base64,{img_sanjay if img_sanjay else ''}" style="width:100%; height:140px; border-radius:10px; object-fit:cover;">
+                <img src="data:image/webp;base64,{img_sanjay if img_sanjay else ''}" style="width:100%; height:140px; border-radius:10px; object-fit:cover; margin-bottom:10px;">
                 <div class="fac-name">Dr. Sanjay Tiwari</div>
-                <div class="fac-title">Prof. & Head</div>
-                <div class="fac-dept">Dept. of Civil Engineering</div>
+                <div class="fac-title">PROF. & HEAD</div>
+                <div class="fac-dept">Dept: Civil Engineering</div>
             </div>
         </div>
     """, unsafe_allow_html=True)
