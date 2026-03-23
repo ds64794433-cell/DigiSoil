@@ -101,8 +101,8 @@ def show_developer_info():
             <div class="dev-info-box">
                 <div class="dev-name-main">Diya Sharma</div>
                 <div class="dev-details">
-                    📍 <strong>Graphic Head</strong> | The Bhagwat Club<br>
                     🎓 2nd Year B.Tech (Civil Eng.)<br>
+                    📍 <strong>Graphic Head</strong> | The Bhagwat Club<br>
                     🏆 <strong>8.6 CGPA</strong>
                 </div>
             </div>
