@@ -197,6 +197,7 @@ MODULES = {
 # --- Sidebar Start ---
 with st.sidebar:
     if os.path.exists("mits_logo.png"):
+        st.write("DEBUG: App version 2.0")
         st.image("mits_logo.png", width=120)
     else:
         st.info("🏗️ DigiSoil '26")
