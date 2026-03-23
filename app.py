@@ -86,7 +86,7 @@ def show_developer_info():
     """, unsafe_allow_html=True)
 
     # 2. THE DEVELOPER SECTION (Horizontal)
-    img_diya = get_image_base64("assets/diyaa.jpeg")
+    img_diya = get_image_base64("diyaa.jpeg")
     
     st.markdown(f"""
         <div class="dev-header">
@@ -95,11 +95,10 @@ def show_developer_info():
             </div>
             <div class="dev-info-box">
                 <div class="dev-name-main">Diya Sharma</div>
-                <div class="dev-tag">Developer & Lead Designer</div>
                 <div style="margin-top: 10px; font-size: 1rem; color: #444;">
-                    📍 <strong>Graphic Head</strong> | MITS Student Org<br>
+                    📍 <strong>Graphic Head</strong> | The Bhagwat Club MITS-DU<br>
                     🎓 2nd Year B.Tech (Civil Engineering)<br>
-                    🏆 <strong>8.6 CGPA</strong> | Lead Designer Aarunya '26
+                    🏆 <strong>8.6 CGPA</strong> 
                 </div>
             </div>
         </div>
@@ -110,14 +109,14 @@ def show_developer_info():
     # 3. THE FACULTY SECTION (Clean Grid)
     st.markdown("<p style='text-align: center; font-weight: 700; opacity: 0.6;'>UNDER THE GUIDANCE OF</p>", unsafe_allow_html=True)
     
-    img_mohit = get_image_base64("assets/mohit_sir.jpg")
-    img_sanjay = get_image_base64("assets/sanjay_sir.webp")
+    img_mohit = get_image_base64("mohit_sir.jpg")
+    img_sanjay = get_image_base64("sanjay_sir.webp")
 
     st.markdown(f"""
         <div class="fac-grid">
             <div class="fac-card">
                 <img src="data:image/jpeg;base64,{img_mohit if img_mohit else ''}" class="fac-img-small">
-                <div style="font-weight: 800; font-size: 1.1rem;">Er. Mohit Aggarwal</div>
+                <div style="font-weight: 800; font-size: 1.1rem;">Dr. Mohit Kumar</div>
                 <div style="color: #FF4B2B; font-size: 0.8rem; font-weight: 700;">ASSISTANT PROFESSOR</div>
                 <div style="font-size: 0.75rem; opacity: 0.6;">Dept: Civil Engineering</div>
             </div>
@@ -130,7 +129,7 @@ def show_developer_info():
         </div>
     """, unsafe_allow_html=True)
 
-    st.info("✨ Developed at MITS Gwalior to automate Geotechnical Laboratory analysis.")
+    st.info("✨ Developed at MITS-DU Gwalior to automate Geotechnical Laboratory analysis.")
 
 # 1. Page Configuration
 st.set_page_config(
