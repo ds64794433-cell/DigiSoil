@@ -20,64 +20,62 @@ def get_image_base64(path):
 
 @st.dialog("Developer & Faculty Mentors")
 def show_developer_info():
-    # 1. CLEAN HORIZONTAL LAYOUT CSS
     st.markdown("""
         <style>
-        /* Container for your photo + name side by side */
         .dev-header {
             display: flex;
             align-items: center;
-            gap: 30px;
+            gap: 25px;
             margin-bottom: 20px;
             padding: 10px;
         }
         .dev-img-box {
-            width: 160px;
-            height: 180px;
+            width: 150px;
+            height: 170px;
             border-radius: 15px;
             overflow: hidden;
-            border: 3px solid #FF4B2B; /* Theme Accent */
-            flex-shrink: 0; /* Prevents squeezing */
-            box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+            border: 3px solid #FF4B2B;
+            flex-shrink: 0;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
         }
         .dev-img-box img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .dev-info-box {
-            flex-grow: 1;
-        }
+        /* ADAPTIVE TEXT COLORS */
         .dev-name-main {
-            font-size: 2.5rem; /* VERY LARGE NAME */
+            font-size: 2.2rem;
             font-weight: 900;
-            color: #1E3A8A; /* Bold Blue */
+            /* Uses theme blue in light, bright blue in dark */
+            color: #3b82f6; 
             line-height: 1.1;
             margin-bottom: 8px;
         }
-        .dev-tag {
-            color: #FF4B2B;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
+        .dev-details {
+            font-size: 1rem;
+            /* This variable automatically flips between black and white */
+            color: var(--text-color); 
+            line-height: 1.5;
         }
-        /* Faculty Grid Styling */
+        /* FACULTY CARDS */
         .fac-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            text-align: center;
+            gap: 15px;
         }
         .fac-card {
-            background: #f9f9f9;
+            /* Uses a transparent background that works in both modes */
+            background: rgba(128, 128, 128, 0.1); 
             padding: 15px;
             border-radius: 15px;
-            border: 1px solid #eee;
+            border: 1px solid rgba(128, 128, 128, 0.2);
+            text-align: center;
+            color: var(--text-color);
         }
         .fac-img-small {
             width: 100%;
-            height: 150px;
+            height: 140px;
             border-radius: 10px;
             object-fit: cover;
             margin-bottom: 10px;
@@ -85,7 +83,6 @@ def show_developer_info():
         </style>
     """, unsafe_allow_html=True)
 
-    # 2. THE DEVELOPER SECTION (Horizontal)
     img_diya = get_image_base64("diyaa.jpeg")
     
     st.markdown(f"""
@@ -95,19 +92,17 @@ def show_developer_info():
             </div>
             <div class="dev-info-box">
                 <div class="dev-name-main">Diya Sharma</div>
-                <div style="margin-top: 10px; font-size: 1rem; color: #444;">
+                <div class="dev-details">
                     📍 <strong>Graphic Head</strong> | The Bhagwat Club MITS-DU<br>
                     🎓 2nd Year B.Tech (Civil Engineering)<br>
-                    🏆 <strong>8.6 CGPA</strong> 
+                    🏆 <span style="color: #FF4B2B; font-weight: bold;">8.6 CGPA</span> 
                 </div>
             </div>
         </div>
     """, unsafe_allow_html=True)
 
     st.divider()
-
-    # 3. THE FACULTY SECTION (Clean Grid)
-    st.markdown("<p style='text-align: center; font-weight: 700; opacity: 0.6;'>UNDER THE GUIDANCE OF</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; font-weight: 700; opacity: 0.7;'>UNDER THE GUIDANCE OF</p>", unsafe_allow_html=True)
     
     img_mohit = get_image_base64("mohit_sir.jpg")
     img_sanjay = get_image_base64("sanjay_sir.webp")
@@ -116,15 +111,13 @@ def show_developer_info():
         <div class="fac-grid">
             <div class="fac-card">
                 <img src="data:image/jpeg;base64,{img_mohit if img_mohit else ''}" class="fac-img-small">
-                <div style="font-weight: 800; font-size: 1.1rem;">Dr. Mohit Kumar</div>
+                <div style="font-weight: 800;">Dr. Mohit Kumar</div>
                 <div style="color: #FF4B2B; font-size: 0.8rem; font-weight: 700;">ASSISTANT PROFESSOR</div>
-                <div style="font-size: 0.75rem; opacity: 0.6;">Dept: Civil Engineering</div>
             </div>
             <div class="fac-card">
                 <img src="data:image/webp;base64,{img_sanjay if img_sanjay else ''}" class="fac-img-small">
-                <div style="font-weight: 800; font-size: 1.1rem;">Dr. Sanjay Tiwari</div>
+                <div style="font-weight: 800;">Dr. Sanjay Tiwari</div>
                 <div style="color: #FF4B2B; font-size: 0.8rem; font-weight: 700;">PROF. & HEAD</div>
-                <div style="font-size: 0.75rem; opacity: 0.6;">Dept: Civil Engineering</div>
             </div>
         </div>
     """, unsafe_allow_html=True)
