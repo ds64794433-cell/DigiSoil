@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
+from scipy.interpolate import pchip_interpolate
+import io
 
 def interpolate_d(target, sieve, percent):
     sieve = np.array(sieve)
@@ -16,115 +18,133 @@ def interpolate_d(target, sieve, percent):
             val2 = max(s_sorted[i+1], 0.0001)
             x1, x2 = np.log10(val1), np.log10(val2)
             y1, y2 = p_sorted[i], p_sorted[i+1]
-            if y1 == y2: 
-                return 10**x1
+            if y1 == y2: return 10**x1
             x = x1 + (target - y1) * (x2 - x1) / (y2 - y1)
             return 10**x
     return None
 
 def run():
-    st.title("🏗️ Grain Size Analysis (Sieve Analysis Method)")
+    st.header("📊 Grain Size Distribution (Sieve Analysis)")
     st.info("DigiSoil | MITS-DU GWALIOR | IS:2720(Part-4):1985")
 
-    if "calculated" not in st.session_state:
-        st.session_state.calculated = False
-
-    total_sample_weight = st.number_input("Total Sample Weight (g)", min_value=0.1, value=1000.0)
-
-    sieve_labels = ["4.75 mm", "2.36 mm", "1.18 mm", "0.600 mm", "0.425 mm", "0.212 mm", "0.150 mm", "0.075 mm", "Pan"]
-    sieve_sizes = [4.75, 2.36, 1.18, 0.600, 0.425, 0.212, 0.150, 0.075, 0.001]
-
-    if "gsd_input_data" not in st.session_state or len(st.session_state.gsd_input_data) != len(sieve_labels):
-        st.session_state.gsd_input_data = pd.DataFrame({
-            "Sieve Size": sieve_labels, 
-            "Weight Retained (g)": [0.0] * len(sieve_labels)
+    # 1. INITIALIZE MASTER STORAGE
+    if "gsd_master_v12" not in st.session_state:
+        st.session_state.gsd_master_v12 = pd.DataFrame({
+            "Sieve Size (mm)": [4.75, 2.36, 1.18, 0.600, 0.425, 0.212, 0.150, 0.075, 0.001],
+            "Weight Retained (g)": [0.0] * 9
         })
+    
+    total_weight = st.number_input("Total Sample Weight (g)", min_value=0.1, value=1000.0, step=0.1)
+    
+    # 2. THE DATA EDITOR
+    edited_output = st.data_editor(
+        st.session_state.gsd_master_v12, 
+        use_container_width=True,
+        key="gsd_editor_v12"
+    )
 
-    edited_df = st.data_editor(st.session_state.gsd_input_data, use_container_width=True)
-
-    if st.button("🚀 Calculate & Generate Curve"):
-        weights = edited_df["Weight Retained (g)"].values
-        sum_of_weights = np.sum(weights)
+    if st.button("🚀 Calculate & Generate Report", use_container_width=True):
+        # --- PRE-CALCULATION CHECK ---
+        raw_edits = st.session_state.gsd_editor_v12
+        df = st.session_state.gsd_master_v12.copy()
+        for row_idx, changes in raw_edits["edited_rows"].items():
+            for col_name, new_val in changes.items():
+                df.at[int(row_idx), col_name] = new_val
         
-        if abs(sum_of_weights - total_sample_weight) > 0.1:
-            st.error(f"❌ Data Entry Error! Sum ({sum_of_weights:.2f}g) doesn't match Total ({total_sample_weight:.2f}g).")
-            st.session_state.calculated = False
-        else:
-            st.success("✅ Data Validated!")
-            st.session_state.calculated = True
+        # Clean data to numeric
+        df["Weight Retained (g)"] = pd.to_numeric(df["Weight Retained (g)"], errors='coerce').fillna(0.0).astype(float)
+        st.session_state.gsd_master_v12 = df
 
-    # --- ALL CALCULATION LOGIC MUST BE INSIDE THIS IF BLOCK AND INDENTED ---
-    if st.session_state.calculated:
-        weights = edited_df["Weight Retained (g)"].values
-        percent_retained = (weights / total_sample_weight) * 100
-        cum_retained = np.cumsum(percent_retained)
-        percent_finer = 100 - cum_retained
+        current_sum = float(df["Weight Retained (g)"].sum())
+        # Tolerance of 0.1g for rounding errors
+        if abs(current_sum - total_weight) > 0.1:
+            # KILL OLD RESULTS
+            if "gsd_final" in st.session_state:
+                del st.session_state.gsd_final
+            
+            # SHOW WARNING
+            st.error("❌ **Calculation Stopped!**")
+            st.warning(f"Check your input data once. Sum of weights ({current_sum:.2f}g) is not equal to Total Sample Weight ({total_weight}g).")
+            st.stop() # STOP EVERYTHING HERE
+
+        # --- CALCULATIONS (Only runs if check passes) ---
+        w_retained = df["Weight Retained (g)"].values
+        p_retained = (w_retained / total_weight) * 100
+        cum_p_retained = np.cumsum(p_retained)
+        p_finer = 100 - cum_p_retained
         
-        x_points = np.array(sieve_sizes)
-        y_points = np.array(percent_finer)
+        analysis_df = df.copy()
+        analysis_df["% Retained"] = p_retained
+        analysis_df["Cum. % Retained"] = cum_p_retained
+        analysis_df["% Finer (Passing)"] = p_finer
 
-        # Correct Indexing for 0.075mm (Index 7)
-        gravel = cum_retained[0]
-        fines = percent_finer[7] 
-        sand = 100 - gravel - fines
+        x_pts = df["Sieve Size (mm)"].values
+        y_pts = p_finer
 
-        D10 = interpolate_d(10, x_points, y_points)
-        D30 = interpolate_d(30, x_points, y_points)
-        D60 = interpolate_d(60, x_points, y_points)
+        d10 = interpolate_d(10, x_pts, y_pts)
+        d30 = interpolate_d(30, x_pts, y_pts)
+        d60 = interpolate_d(60, x_pts, y_pts)
 
-        cu, cc = None, None
-        if D10 and D60 and D10 > 0:
-            cu = D60 / D10
-            cc = (D30**2) / (D10 * D60) if D30 else None
+        cu = d60 / d10 if (d10 and d60 and d10 > 0) else 0
+        cc = (d30**2) / (d10 * d60) if (d10 and d30 and d60 and (d10*d60) > 0) else 0
 
-        # Syncing with session state for full_classification.py
-        st.session_state.update({
-            "d10_val": D10, "d30_val": D30, "d60_val": D60,
-            "cu_result": cu, "cc_result": cc,
-            "gravel_percent": gravel, "fines_percent": fines, "sand_percent": sand
-        })
+        st.session_state.gsd_final = {
+            "d10": d10, "d30": d30, "d60": d60, "cu": cu, "cc": cc,
+            "table": analysis_df, "x": x_pts, "y": y_pts,
+            "gravel": cum_p_retained[0], "fines": p_finer[7], 
+            "sand": 100 - cum_p_retained[0] - p_finer[7]
+        }
+        st.success("✅ Weights Verified. Report Generated.")
+        st.rerun()
 
-        st.subheader("📌 Grain Size Parameters")
-        def fmt(val, precision=3):
-            return f"{val:.{precision}f}" if val is not None else "N/A"
-
-        param_df = pd.DataFrame({
-            "Parameter": ["D60 (mm)", "D30 (mm)", "D10 (mm)", "Cu (Uniformity)", "Cc (Curvature)"],
-            "Value": [fmt(D60), fmt(D30), fmt(D10), fmt(cu, 2), fmt(cc, 2)]
-        })
-        st.table(param_df)
+    # --- 3. PERSISTENT RESULTS DISPLAY ---
+    if "gsd_final" in st.session_state:
+        res = st.session_state.gsd_final
+        
+        st.divider()
+        st.subheader("📋 Sieve Analysis Calculation Table")
+        st.table(res["table"].style.format(precision=2))
 
         st.subheader("📈 Particle Size Distribution Curve")
         fig, ax = plt.subplots(figsize=(10, 6))
-        ax.semilogx(x_points, y_points, color='#1f77b4', marker='o', mfc='red', markersize=8, linewidth=2.5, label='Soil Sample')
-            
-        for d_val, label, color in zip([D60, D30, D10], ["D60", "D30", "D10"], ["orange", "green", "purple"]):
-            if d_val:
-                target_y = int(label[1:])
-                ax.hlines(y=target_y, xmin=d_val, xmax=5.0, colors=color, linestyles='--', alpha=0.6)
-                ax.vlines(x=d_val, ymin=0, ymax=target_y, colors=color, linestyles='--', alpha=0.6, label=f"{label}: {d_val:.3f} mm")
+        
+        sort_idx = np.argsort(res['x'])
+        x_s, y_s = res['x'][sort_idx], res['y'][sort_idx]
+        x_smooth = np.logspace(np.log10(x_s[0]), np.log10(x_s[-1]), 500)
+        y_smooth = pchip_interpolate(x_s, y_s, x_smooth)
 
-        ax.set_xlim(5.0, 0.001)
+        ax.semilogx(x_smooth, y_smooth, color='#1E3A8A', linewidth=2.5, label='Gradation Curve', zorder=2)
+        ax.scatter(res['x'], res['y'], color='#FF4B2B', s=80, edgecolors='white', zorder=5)
+
+        # Draw D10, D30, D60 Lines
+        line_data = [ (res['d60'], 60, '#FFA500', 'D60'), (res['d30'], 30, '#228B22', 'D30'), (res['d10'], 10, '#800080', 'D10') ]
+        for val, percent, color, label in line_data:
+            if val:
+                ax.hlines(y=percent, xmin=val, xmax=10.0, colors=color, linestyles='--', alpha=0.7)
+                ax.vlines(x=val, ymin=0, ymax=percent, colors=color, linestyles='--', alpha=0.7)
+                ax.text(val, 2, f' {label}', color=color, fontweight='bold', fontsize=9)
+
+        ax.set_xlim(10.0, 0.001)
         ax.set_ylim(0, 105)
-        ax.set_xlabel("Particle Size (mm) - Log Scale", fontweight='bold')
-        ax.set_ylabel("Percent Passing (%)", fontweight='bold')
-        ax.grid(True, which='both', linestyle=':', alpha=0.5)
+        ax.set_xlabel("Particle Size (mm) [Log Scale]", fontweight='bold')
+        ax.set_ylabel("Percentage Passing (%)", fontweight='bold')
+        ax.grid(True, which='both', linestyle=':', alpha=0.6)
         ax.xaxis.set_major_formatter(ScalarFormatter())
         ax.legend(loc='upper left')
-        plt.text(0.95, 0.05, 'DigiSoil | MITS Gwalior', transform=ax.transAxes, ha='right', alpha=0.3)
         st.pyplot(fig)
-        fig.savefig("gsd_curve.png", dpi=300, bbox_inches='tight')
 
-        col_down, _ = st.columns(2)
-        with col_down:
-            with open("gsd_curve.png", "rb") as file:
-                st.download_button(label="📥 Download Graph", data=file, file_name="MITS_GSD.png", mime="image/png")
+        # Download Button
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", dpi=300, bbox_inches='tight')
+        st.download_button("📥 Download Curve", buf.getvalue(), "MITS_GSD_Report.png", "image/png", use_container_width=True)
 
-    # --- Back to Home Button (Outside the calculation check) ---
+        # Parameters Table
+        st.table(pd.DataFrame({
+            "Property": ["D60", "D30", "D10", "Uniformity (Cu)", "Curvature (Cc)"],
+            "Value": [f"{res['d60']:.3f} mm", f"{res['d30']:.3f} mm", f"{res['d10']:.3f} mm", f"{res['cu']:.2f}", f"{res['cc']:.2f}"]
+        }))
+
     st.divider()
     if st.button("🏠 Back to Home", use_container_width=True):
         st.session_state.nav_choice = "Home"
         st.rerun()
-
-if __name__ == "__main__":
-    run()
