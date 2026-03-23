@@ -101,7 +101,8 @@ def show_developer_info():
             <div class="dev-info-box">
                 <div class="dev-name-main">Diya Sharma</div>
                 <div class="dev-details">
-                    🎓 2nd Year B.Tech (Civil Eng.)<br>
+                       (BTCE24O1027)<br>
+                    🎓 2nd Year B.Tech (Civil Engineering)<br>
                     📍 <strong>Graphic Head</strong> | The Bhagwat Club<br>
                     🏆 <strong>8.6 CGPA</strong>
                 </div>
@@ -204,8 +205,7 @@ MODULES = {
 
 # --- Sidebar Start ---
 with st.sidebar:
-    if os.path.exists("mits_logo.png"):
-        st.write("DEBUG: App version 2.0")
+    if os.path.exists("mits_logo.png")
         st.image("mits_logo.png", width=120)
     else:
         st.info("🏗️ DigiSoil '26")
