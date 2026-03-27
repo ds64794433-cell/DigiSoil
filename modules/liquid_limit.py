@@ -61,7 +61,7 @@ def run():
                         f"❌ Invalid Data: Blow count(s) {out_of_range} are outside the standard range (10–40). "
                         "Liquid Limit calculation stopped. Please correct your lab data."
                     )
-                return
+                    st.stop()   # ✅ use this instead of return
                 
                 w_cont = df_clean.iloc[:, 1].values
                 w_wet = df_clean.iloc[:, 2].values
