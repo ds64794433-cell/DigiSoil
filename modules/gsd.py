@@ -30,7 +30,7 @@ def run():
     # 1. INITIALIZE MASTER STORAGE
     if "gsd_master_v12" not in st.session_state:
         st.session_state.gsd_master_v12 = pd.DataFrame({
-            "Sieve Size (mm)": [4.75, 2.36, 1.18, 0.600, 0.425, 0.212, 0.150, 0.075, "0.00"],
+            "Sieve Size (mm)": [4.75, 2.36, 1.18, 0.600, 0.425, 0.212, 0.150, 0.075, "0.0"],
             "Weight Retained (g)": [0.0] * 9
         })
     
@@ -110,8 +110,8 @@ def run():
         
         sort_idx = np.argsort(res['x'])
         x_s, y_s = res['x'][sort_idx], res['y'][sort_idx]
-        x_smooth = np.logspace(np.log10(x_s[0]), np.log10(x_s[-1]), 500)
-        y_smooth = pchip_interpolate(x_s, y_s, x_smooth)
+        x_s = x_s[x_s > 0]
+        y_s = y_s[-len(x_s):]
 
         ax.semilogx(x_smooth, y_smooth, color='#1E3A8A', linewidth=2.5, label='Gradation Curve', zorder=2)
         ax.scatter(res['x'], res['y'], color='#FF4B2B', s=80, edgecolors='white', zorder=5)
