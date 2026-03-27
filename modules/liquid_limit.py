@@ -52,6 +52,17 @@ def run():
         else:
             try:
                 blows = df_clean.iloc[:, 0].values
+                    
+                # --- Blow Range Validation (STRICT: Stop if invalid) ---
+                out_of_range = [int(b) for b in blows if b < 10 or b > 40]
+
+                if len(out_of_range) > 0:
+                    st.error(
+                        f"❌ Invalid Data: Blow count(s) {out_of_range} are outside the standard range (10–40). "
+                        "Liquid Limit calculation stopped. Please correct your lab data."
+                    )
+                return
+                
                 w_cont = df_clean.iloc[:, 1].values
                 w_wet = df_clean.iloc[:, 2].values
                 w_dry = df_clean.iloc[:, 3].values
