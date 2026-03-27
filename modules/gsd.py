@@ -110,9 +110,16 @@ def run():
         
         sort_idx = np.argsort(res['x'])
         x_s, y_s = res['x'][sort_idx], res['y'][sort_idx]
-        x_s = x_s[x_s > 0]
-        y_s = y_s[-len(x_s):]
 
+# Remove zero or invalid values
+        mask = x_s > 0
+        x_s, y_s = x_s[mask], y_s[mask]
+
+# 🔥 DEFINE THESE (THIS WAS MISSING)
+        x_smooth = np.logspace(np.log10(x_s.min()), np.log10(x_s.max()), 500)
+        y_smooth = pchip_interpolate(x_s, y_s, x_smooth)
+
+# Now plot
         ax.semilogx(x_smooth, y_smooth, color='#1E3A8A', linewidth=2.5, label='Gradation Curve', zorder=2)
         ax.scatter(res['x'], res['y'], color='#FF4B2B', s=80, edgecolors='white', zorder=5)
 
