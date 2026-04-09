@@ -103,7 +103,6 @@ def show_developer_info():
                 <div class="dev-details">
                        (BTCE24O1027)<br>
                     🎓 2nd Year B.Tech (Civil Engineering)<br>
-                    📍 <strong>Graphic Head</strong> | The Bhagwat Club<br>
                     🏆 <strong>8.6 CGPA</strong>
                 </div>
             </div>
