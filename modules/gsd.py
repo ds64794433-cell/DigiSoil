@@ -12,6 +12,9 @@ def interpolate_d(target, sieve, percent):
     idx = np.argsort(percent)[::-1]
     s_sorted, p_sorted = sieve[idx], percent[idx]
 
+    if target < min(p_sorted):
+        return None
+
     for i in range(len(p_sorted) - 1):
         if p_sorted[i] >= target >= p_sorted[i+1]:
             val1 = max(s_sorted[i], 0.0001)
@@ -85,8 +88,9 @@ def run():
         d30 = interpolate_d(30, x_pts, y_pts)
         d60 = interpolate_d(60, x_pts, y_pts)
 
-        cu = d60 / d10 if (d10 and d60 and d10 > 0) else 0
-        cc = (d30**2) / (d10 * d60) if (d10 and d30 and d60 and (d10*d60) > 0) else 0
+        # Calculation with safety checks
+        cu = d60 / d10 if (d10 and d60 and d10 > 0.001) else np.nan
+        cc = (d30**2) / (d10 * d60) if (d10 and d30 and d60 and (d10*d60) > 0) else np.nan
 
         st.session_state.gsd_final = {
             "d10": d10, "d30": d30, "d60": d60, "cu": cu, "cc": cc,
@@ -145,10 +149,16 @@ def run():
         fig.savefig(buf, format="png", dpi=300, bbox_inches='tight')
         st.download_button("📥 Download Curve", buf.getvalue(), "MITS_GSD_Report.png", "image/png", use_container_width=True)
 
-        # Parameters Table
+        # In the persistent results display:
         st.table(pd.DataFrame({
             "Property": ["D60", "D30", "D10", "Uniformity (Cu)", "Curvature (Cc)"],
-            "Value": [f"{res['d60']:.3f} mm", f"{res['d30']:.3f} mm", f"{res['d10']:.3f} mm", f"{res['cu']:.2f}", f"{res['cc']:.2f}"]
+            "Value": [
+                f"{res['d60']:.3f} mm" if res['d60'] else "N/A",
+                f"{res['d30']:.3f} mm" if res['d30'] else "N/A",
+                f"{res['d10']:.3f} mm" if res['d10'] else "See Hydrometer",
+                f"{res['cu']:.2f}" if not np.isnan(res['cu']) else "N/A",
+                f"{res['cc']:.2f}" if not np.isnan(res['cc']) else "N/A"
+            ]
         }))
 
     st.divider()
