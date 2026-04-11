@@ -149,16 +149,26 @@ def run():
         fig.savefig(buf, format="png", dpi=300, bbox_inches='tight')
         st.download_button("📥 Download Curve", buf.getvalue(), "MITS_GSD_Report.png", "image/png", use_container_width=True)
 
-        # In the persistent results display:
+        # Parameters Table - Professional Formatting
+        
+        # 1. Prepare display values with safety checks
+        d60_disp = f"{res['d60']:.3f} mm" if res['d60'] else "-"
+        d30_disp = f"{res['d30']:.3f} mm" if res['d30'] else "-"
+        
+        # D10 is the most common to be missing in fine-grained soils
+        d10_disp = f"{res['d10']:.3f} mm" if res['d10'] else "Use Hydrometer"
+
+        # Check for NaN or 0 for Cu and Cc
+        cu_val = res['cu']
+        cc_val = res['cc']
+        
+        cu_disp = f"{cu_val:.2f}" if (not np.isnan(cu_val) and cu_val > 0) else "-"
+        cc_disp = f"{cc_val:.2f}" if (not np.isnan(cc_val) and cc_val > 0) else "-"
+
+        # 2. Render the table
         st.table(pd.DataFrame({
             "Property": ["D60", "D30", "D10", "Uniformity (Cu)", "Curvature (Cc)"],
-            "Value": [
-                f"{res['d60']:.3f} mm" if res['d60'] else "N/A",
-                f"{res['d30']:.3f} mm" if res['d30'] else "N/A",
-                f"{res['d10']:.3f} mm" if res['d10'] else "See Hydrometer",
-                f"{res['cu']:.2f}" if not np.isnan(res['cu']) else "N/A",
-                f"{res['cc']:.2f}" if not np.isnan(res['cc']) else "N/A"
-            ]
+            "Value": [d60_disp, d30_disp, d10_disp, cu_disp, cc_disp]
         }))
 
     st.divider()
