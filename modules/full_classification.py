@@ -109,7 +109,7 @@ def run():
     
     # From Moisture/Specific Gravity
     nmc = st.session_state.get("nmc_result", 0.0)
-    gs = st.session_state.get("gs_result", 2.65) # Adjusted to your GS key
+    gs = st.session_state.get("gs_result", 2.65) 
 
     if not gsd and ll == 0:
         st.warning("⚠️ Insufficient data. Please complete Sieve Analysis and Atterberg Limit tests first.")
@@ -130,7 +130,7 @@ def run():
         # COARSE GRAINED SOIL
         if fines < 50:
             prefix = "G" if gravel > sand else "S"
-            # Well graded check
+            # Well-graded check
             if prefix == "G":
                 is_well = (cu > 4 and 1 <= cc <= 3)
             else:
