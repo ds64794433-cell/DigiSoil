@@ -109,7 +109,7 @@ def run():
     
     # From Moisture/Specific Gravity
     nmc = st.session_state.get("nmc_result", 0.0)
-    gs = st.session_state.get("gs_result", 2.65) 
+    gs = st.session_state.get("gs_result", 0.0) 
 
     if not gsd and ll == 0:
         st.warning("⚠️ Insufficient data. Please complete Sieve Analysis and Atterberg Limit tests first.")
