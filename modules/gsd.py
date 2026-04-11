@@ -89,8 +89,8 @@ def run():
         d60 = interpolate_d(60, x_pts, y_pts)
 
         # Calculation with safety checks
-        cu = d60 / d10 if (d10 and d60 and d10 > 0.001) else np.none
-        cc = (d30**2) / (d10 * d60) if (d10 and d30 and d60 and (d10*d60) > 0) else np.none
+        cu = d60 / d10 if (d10 and d60 and d10 > 0.001) else np.nan
+        cc = (d30**2) / (d10 * d60) if (d10 and d30 and d60 and (d10*d60) > 0) else np.nan
 
         st.session_state.gsd_final = {
             "d10": d10, "d30": d30, "d60": d60, "cu": cu, "cc": cc,
