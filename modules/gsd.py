@@ -61,14 +61,14 @@ def run():
         current_sum = float(df["Weight Retained (g)"].sum())
         # Tolerance of 0.1g for rounding errors
         if abs(current_sum - total_weight) > 0.1:
-            # KILL OLD RESULTS
+            
             if "gsd_final" in st.session_state:
                 del st.session_state.gsd_final
             
             # SHOW WARNING
             st.error("❌ **Calculation Stopped!**")
             st.warning(f"Check your input data once. Sum of weights ({current_sum:.2f}g) is not equal to Total Sample Weight ({total_weight}g).")
-            st.stop() # STOP EVERYTHING HERE
+            st.stop() 
 
         # --- CALCULATIONS (Only runs if check passes) ---
         w_retained = df["Weight Retained (g)"].values
@@ -115,15 +115,14 @@ def run():
         sort_idx = np.argsort(res['x'])
         x_s, y_s = res['x'][sort_idx], res['y'][sort_idx]
 
-# Remove zero or invalid values
         mask = x_s > 0
         x_s, y_s = x_s[mask], y_s[mask]
 
-# 🔥 DEFINE THESE (THIS WAS MISSING)
+
         x_smooth = np.logspace(np.log10(x_s.min()), np.log10(x_s.max()), 500)
         y_smooth = pchip_interpolate(x_s, y_s, x_smooth)
 
-# Now plot
+
         ax.semilogx(x_smooth, y_smooth, color='#1E3A8A', linewidth=2.5, label='Gradation Curve', zorder=2)
         ax.scatter(res['x'], res['y'], color='#FF4B2B', s=80, edgecolors='white', zorder=5)
 
@@ -155,7 +154,7 @@ def run():
         d60_disp = f"{res['d60']:.3f} mm" if res['d60'] else "-"
         d30_disp = f"{res['d30']:.3f} mm" if res['d30'] else "-"
         
-        # D10 is the most common to be missing in fine-grained soils
+        
         d10_disp = f"{res['d10']:.3f} mm" if res['d10'] else "Use Hydrometer"
 
         # Check for NaN or 0 for Cu and Cc
