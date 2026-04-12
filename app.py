@@ -103,7 +103,7 @@ def show_developer_info():
                 <div class="dev-details">
                        (BTCE24O1027)<br>
                     🎓 2nd Year B.Tech (Civil Engineering)<br>
-                    🏆 <strong>8.6 CGPA</strong>
+                    🏆 <strong>8.92 CGPA</strong>
                 </div>
             </div>
         </div>
