@@ -90,32 +90,38 @@ def run():
     st.header("📑 IS 1498 Final Classification")
     st.info("DigiSoil '26 | MITS-DU Gwalior")
 
-    # --- 1. DATA RETRIEVAL (Pulling from other modules) ---
-    # From GSD Module
+    # --- 1. DATA RETRIEVAL ---
     gsd = st.session_state.get("gsd_final", {})
+    ll = st.session_state.get("liquid_limit_val")
+    pl = st.session_state.get("plastic_limit_val")
+    
+    # Check if a new GSD was performed but LL/PL are missing (Reset Check)
+    if not gsd or ll is None or pl is None:
+        if "res_symbol" in st.session_state:
+            del st.session_state.res_symbol
+        if "classified" in st.session_state:
+            del st.session_state.classified
+
+        st.warning("⚠️ **Insufficient Data:** Soil classification requires complete Sieve Analysis and Atterberg Limit tests.")
+        
+        c1, c2, c3 = st.columns(3)
+        c1.write(f"GSD: {'✅' if gsd else '❌'}")
+        c2.write(f"Liquid Limit: {'✅' if ll is not None else '❌'}")
+        c3.write(f"Plastic Limit: {'✅' if pl is not None else '❌'}")
+        
+        st.info("Please finish all tests before generating the final symbol to ensure engineering accuracy.")
+        return 
+
+    # --- 2. CALCULATION & DASHBOARD ---
+    # Now we are safe to calculate PI
+    pi = ll - pl
     fines = gsd.get("fines", 0.0)
     gravel = gsd.get("gravel", 0.0)
     sand = gsd.get("sand", 0.0)
     cu = gsd.get("cu", 0.0)
     cc = gsd.get("cc", 0.0)
-    d10 = gsd.get("d10", 0.0)
-    d30 = gsd.get("d30", 0.0)
-    d60 = gsd.get("d60", 0.0)
     
-    # From Atterberg Modules
-    ll = st.session_state.get("liquid_limit_val", 0.0)
-    pl = st.session_state.get("plastic_limit_val", 0.0)
-    pi = ll - pl
-    
-    # From Moisture/Specific Gravity
-    nmc = st.session_state.get("nmc_result", 0.0)
-    gs = st.session_state.get("gs_result", 0.0) 
-
-    if not gsd and ll == 0:
-        st.warning("⚠️ Insufficient data. Please complete Sieve Analysis and Atterberg Limit tests first.")
-        return 
-
-    # --- 2. DASHBOARD DISPLAY ---
+    # DASHBOARD DISPLAY
     st.subheader("📊 Collected Test Results")
     col1, col2, col3 = st.columns(3)
     col1.metric("Gravel / Sand / Fines", f"{gravel:.1f}/{sand:.1f}/{fines:.1f}")
@@ -130,7 +136,6 @@ def run():
         # COARSE GRAINED SOIL
         if fines < 50:
             prefix = "G" if gravel > sand else "S"
-            # Well-graded check
             if prefix == "G":
                 is_well = (cu > 4 and 1 <= cc <= 3)
             else:
@@ -150,7 +155,6 @@ def run():
         # FINE GRAINED SOIL
         else:
             compressibility = "L" if ll < 35 else "I" if ll <= 50 else "H"
-            # CL-ML borderline case
             if 4 <= pi <= 7 and (ll < 35) and (pi >= a_line):
                 symbol = "CL-ML"
             else:
@@ -177,9 +181,7 @@ def run():
             "Plastic Limit (%)": f"{pl:.2f}",
             "Plasticity Index (%)": f"{pi:.2f}",
             "Uniformity Coeff (Cu)": f"{cu:.2f}" if cu else "N/A",
-            "Curvature Coeff (Cc)": f"{cc:.2f}" if cc else "N/A",
-            "Specific Gravity": f"{gs:.2f}",
-            "Natural Moisture (%)": f"{nmc:.2f}"
+            "Curvature Coeff (Cc)": f"{cc:.2f}" if cc else "N/A"
         }
 
         pdf_bytes = create_pdf(report_data, symbol, desc, rec)
