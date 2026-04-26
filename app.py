@@ -102,7 +102,7 @@ def show_developer_info():
 
     # 2. THE DEVELOPER SECTION
     # Added 'assets/' prefix to match your folder structure
-    img_diya = get_image_base64("diyaa.jpeg") 
+    img_diya = get_image_base64("diya.jpeg") 
     
     # Placeholder to prevent broken icons if the file is missing
     empty_img = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
