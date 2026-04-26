@@ -130,8 +130,8 @@ def show_developer_info():
     st.markdown("<p style='text-align: center; font-weight: 700; color: #9CA3AF; letter-spacing: 1px;'>UNDER THE GUIDANCE OF</p>", unsafe_allow_html=True)
     
     # Updated paths for faculty images in the assets folder
-    img_mohit = get_image_base64("assets/mohit_sir.jpg")
-    img_sanjay = get_image_base64("assets/sanjay_sir.webp")
+    img_mohit = get_image_base64("mohit_sir.jpg")
+    img_sanjay = get_image_base64("sanjay_sir.webp")
 
     mohit_src = f"data:image/jpeg;base64,{img_mohit}" if img_mohit else empty_img
     sanjay_src = f"data:image/webp;base64,{img_sanjay}" if img_sanjay else empty_img
