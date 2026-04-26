@@ -101,11 +101,17 @@ def show_developer_info():
     """, unsafe_allow_html=True)
 
     # 2. THE DEVELOPER SECTION
-    img_diya = get_image_base64("diyaa.jpeg")
+    # Added 'assets/' prefix to match your folder structure
+    img_diya = get_image_base64("assets/diyaa.jpeg") 
+    
+    # Placeholder to prevent broken icons if the file is missing
+    empty_img = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+    diya_src = f"data:image/jpeg;base64,{img_diya}" if img_diya else empty_img
+
     st.markdown(f"""
         <div class="dev-header">
             <div class="dev-img-box">
-                <img src="data:image/jpeg;base64,{img_diya if img_diya else ''}">
+                <img src="{diya_src}">
             </div>
             <div class="dev-info-box">
                 <div class="dev-name-main">Diya Sharma</div>
@@ -121,24 +127,25 @@ def show_developer_info():
     st.divider()
 
     # 3. THE FACULTY SECTION
-    st.markdown("<p style='text-align: center; font-weight: 700; color: #9CA3AF;'>UNDER THE GUIDANCE OF</p>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; font-weight: 700; color: #9CA3AF; letter-spacing: 1px;'>UNDER THE GUIDANCE OF</p>", unsafe_allow_html=True)
     
-    img_mohit = get_image_base64("mohit_sir.jpg")
-    img_sanjay = get_image_base64("sanjay_sir.webp")
+    # Updated paths for faculty images in the assets folder
+    img_mohit = get_image_base64("assets/mohit_sir.jpg")
+    img_sanjay = get_image_base64("assets/sanjay_sir.webp")
 
-    # Use this inside your fac-grid markdown to ensure photos are perfectly aligned
+    mohit_src = f"data:image/jpeg;base64,{img_mohit}" if img_mohit else empty_img
+    sanjay_src = f"data:image/webp;base64,{img_sanjay}" if img_sanjay else empty_img
+
     st.markdown(f"""
         <div class="fac-grid">
             <div class="fac-card">
-                <img src="data:image/jpeg;base64,{img_mohit if img_mohit else ''}" 
-                     style="width:100%; height:160px; border-radius:10px; object-fit:cover;">
+                <img class="fac-photo" src="{mohit_src}">
                 <div class="fac-name">Dr. Mohit Kumar</div>
                 <div class="fac-title">Assistant Professor</div>
                 <div class="fac-dept">Department of Civil Engineering</div>
             </div>
             <div class="fac-card">
-                <img src="data:image/webp;base64,{img_sanjay if img_sanjay else ''}" 
-                     style="width:100%; height:160px; border-radius:10px; object-fit:cover;">
+                <img class="fac-photo" src="{sanjay_src}">
                 <div class="fac-name">Dr. Sanjay Tiwari</div>
                 <div class="fac-title">Prof. & Head</div>
                 <div class="fac-dept">Department of Civil Engineering</div>
@@ -147,7 +154,6 @@ def show_developer_info():
     """, unsafe_allow_html=True)
 
     st.info("✨ Developed at MITS-DU Gwalior to automate Geotechnical Laboratory analysis.")
-
 # 1. Page Configuration
 st.set_page_config(
     page_title="DigiSoil | MITS-DU Gwalior", 
