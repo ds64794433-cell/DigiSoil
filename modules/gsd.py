@@ -58,6 +58,16 @@ def run():
         df["Weight Retained (g)"] = pd.to_numeric(df["Weight Retained (g)"], errors='coerce').fillna(0.0).astype(float)
         st.session_state.gsd_master_v12 = df
 
+        # --- RESET DEPENDENT MODULES ---
+        # Clearing old data to prevent mismatched soil classification
+        outdated_keys = [
+            'liquid_limit_val', 'plastic_limit_val', 'pi_val', 
+            'nmc_result', 'gs_result', 'll_final', 'pl_final'
+        ]
+        for key in outdated_keys:
+            if key in st.session_state:
+                del st.session_state[key]
+
         current_sum = float(df["Weight Retained (g)"].sum())
         # Tolerance of 0.1g for rounding errors
         if abs(current_sum - total_weight) > 0.1:
