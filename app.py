@@ -20,7 +20,7 @@ def get_image_base64(path):
 
 @st.dialog("Developer & Faculty Mentors")
 def show_developer_info():
-    # 1. UPDATED CSS FOR BETTER VISIBILITY
+    # 1. SMART ADAPTIVE CSS FOR BOTH MODES
     st.markdown("""
         <style>
         .dev-header {
@@ -44,22 +44,22 @@ def show_developer_info():
             height: 100%;
             object-fit: cover;
         }
+        /* Uses Streamlit's primary text color variable */
         .dev-name-main {
             font-size: 2.2rem;
             font-weight: 900;
-            color: #60A5FA; /* Brighter Blue for Dark Mode */
+            color: #60A5FA; /* Stays blue for branding */
             line-height: 1.1;
             margin-bottom: 5px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
-        /* Style for the details text */
         .dev-details {
             font-size: 1rem;
-            color: #E5E7EB; /* Off-white/Light gray */
+            color: var(--text-color); /* ADAPTIVE: Black in light mode, White in dark mode */
             line-height: 1.5;
+            opacity: 0.9;
         }
         .dev-details strong {
-            color: #FFA500; /* Orange highlight for titles */
+            color: #FF4B2B; /* Accent color for CGPA */
         }
         .fac-grid {
             display: grid;
@@ -68,25 +68,34 @@ def show_developer_info():
             text-align: center;
         }
         .fac-card {
-            background: rgba(255, 255, 255, 0.05); /* Semi-transparent background */
+            background: var(--background-color); /* Matches theme */
             padding: 15px;
             border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid #FF4B2B; /* Unified border color */
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+        .fac-photo {
+            width: 100%;
+            height: 160px;
+            border-radius: 10px;
+            object-fit: cover;
         }
         .fac-name {
             font-weight: 800;
             font-size: 1.1rem;
-            color: #FFFFFF; /* Pure white name */
+            color: var(--text-color); /* ADAPTIVE */
+            margin-top: 8px;
         }
         .fac-title {
-            color: #FF4B2B; /* Vibrant accent red */
-            font-size: 0.8rem;
+            color: #FF4B2B; 
+            font-size: 0.85rem;
             font-weight: 700;
             margin-top: 4px;
         }
         .fac-dept {
             font-size: 0.75rem;
-            color: #9CA3AF; /* Muted gray for secondary info */
+            color: var(--text-color); /* ADAPTIVE */
+            opacity: 0.6;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -157,13 +166,14 @@ st.markdown("""
         background: linear-gradient(135deg, rgba(30,58,138,0.05) 0%, rgba(255,75,43,0.05) 100%);
     }
     .module-card {
-        background: rgba(255, 255, 255, 0.05);
+        background: var(--secondary-background-color);
         backdrop-filter: blur(10px);
         padding: 1.5rem;
         border-radius: 15px 15px 0 0; 
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(128, 128, 128, 0.2);
         border-top: 5px solid #FF4B2B;
         text-align: center;
+        color: var(--text-color); /* ADAPTIVE */
         height: 180px;
         display: flex;
         flex-direction: column;
